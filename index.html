@@ -307,6 +307,10 @@
                         </div>
 
                     </div>
+                    <!-- FIX: Butang Bypass untuk semua ejen selepas tamat rebutan -->
+                    <div class="mt-8 flex justify-center z-50 relative w-full">
+                        <button onclick="nextPhase(3)" class="btn-outline px-10 py-4 text-sm bg-white shadow-sm border-slate-300 text-slate-500 hover:text-cyan-600 hover:border-cyan-400">Abaikan Rebutan & Teruskan <i class="fa-solid fa-arrow-right ml-2"></i></button>
+                    </div>
                 </div>
 
                 <div id="phase-3" class="hidden w-full animate-fade-in">
@@ -340,6 +344,8 @@
                                 <button id="btn-check-puzzle" onclick="checkMultiPuzzle()" class="btn-glow w-full py-5 text-lg">Sahkan Susunan</button>
                                 <div class="flex flex-col sm:flex-row gap-4 w-full">
                                     <button onclick="resetCurrentPuzzle()" class="btn-outline flex-1 py-4 text-base bg-white">Reset Susunan</button>
+                                    <!-- FIX: Butang Langkau Puzzle disediakan -->
+                                    <button onclick="nextPhase(4)" class="btn-outline flex-1 py-4 text-base bg-white border-slate-300 text-slate-400 hover:text-cyan-600 hover:border-cyan-400">Langkau Teras</button>
                                     <button id="btn-next-pz-level" onclick="nextPuzzleLevel()" class="hidden btn-glow flex-[2] py-4 text-base bg-gradient-to-r from-blue-500 to-indigo-600 shadow-md">Tahap Seterusnya <i class="fa-solid fa-forward-step ml-2"></i></button>
                                     <button id="btn-next-phase-3" onclick="nextPhase(4)" class="hidden btn-glow flex-[2] py-4 text-base bg-gradient-to-r from-emerald-500 to-teal-600 shadow-md">Teruskan Ke Fasa Diagnosis <i class="fa-solid fa-arrow-right ml-2"></i></button>
                                 </div>
@@ -489,13 +495,18 @@
                     <div class="slide" id="slide-2">
                         <div class="inline-block px-5 py-2 rounded-full bg-slate-200 border border-slate-300 text-slate-800 text-sm font-bold tracking-widest mb-8 uppercase">Induksi (See-Think-Wonder)</div>
                         <h2 class="text-6xl font-bold mb-10 uppercase text-slate-900">Ancaman atau Evolusi?</h2>
-                        <div class="w-full max-w-6xl mx-auto h-[500px] rounded-3xl border-4 border-white shadow-2xl mb-10 flex items-center justify-center relative overflow-hidden group">
-                            <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=1000&auto=format&fit=crop" class="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition duration-700">
-                        </div>
-                        <div class="flex justify-center gap-10">
-                            <span class="px-10 py-4 bg-white shadow-lg rounded-full text-lg font-bold text-slate-800 border border-slate-100"><i class="fa-solid fa-eye text-cyan-500 mr-3 text-2xl"></i>Lihat</span>
-                            <span class="px-10 py-4 bg-white shadow-lg rounded-full text-lg font-bold text-slate-800 border border-slate-100"><i class="fa-solid fa-brain text-cyan-500 mr-3 text-2xl"></i>Fikir</span>
-                            <span class="px-10 py-4 bg-white shadow-lg rounded-full text-lg font-bold text-slate-800 border border-slate-100"><i class="fa-solid fa-question text-cyan-500 mr-3 text-2xl"></i>Tanya</span>
+                        <div class="w-full max-w-6xl mx-auto h-[500px] rounded-3xl border-4 border-white shadow-2xl mb-10 flex items-center justify-center relative overflow-hidden group cursor-pointer" onclick="window.revealDilemma()">
+                            <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=1000&auto=format&fit=crop" class="absolute inset-0 w-full h-full object-cover z-0">
+                            <div class="z-10 bg-slate-900/80 backdrop-blur px-10 py-6 rounded-2xl shadow-2xl border border-slate-600 font-black text-2xl uppercase tracking-widest text-white hover:scale-105 transition-transform flex items-center reveal-btn">
+                                <i class="fa-solid fa-wand-magic-sparkles mr-4 text-amber-500"></i> Dedahkan Perbincangan
+                            </div>
+                            <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-sm flex flex-col justify-center items-center gap-6 hidden-content z-20 p-10 text-left">
+                                <h3 class="text-amber-400 text-4xl font-black mb-4 w-full max-w-4xl">Fokus Analisis (See-Think-Wonder):</h3>
+                                <ul class="text-white text-2xl space-y-8 w-full max-w-4xl font-medium leading-relaxed">
+                                    <li class="flex items-start"><i class="fa-solid fa-eye text-amber-500 mt-1 mr-4"></i> <b>Maksud Imej:</b> Berdasarkan observasi anda, apakah maksud tersirat di sebalik dua kontras gambar ini?</li>
+                                    <li class="flex items-start"><i class="fa-solid fa-brain text-amber-500 mt-1 mr-4"></i> <b>Kesan Isu:</b> Apakah kesan atau impak langsung visual ini terhadap kelangsungan alam dan kemanusiaan?</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
 
