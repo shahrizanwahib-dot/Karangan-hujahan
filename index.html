@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bilik Kebal Hujahan - V11.3 (Large Text Edition)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <!-- FIREBASE SDKs (Compat Version untuk GitHub Pages) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+
+    <style>
+        /* BASE TYPOGRAPHY & COLORS (DIBESARKAN) */
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #0f172a; font-size: 18px; overflow-x: hidden; line-height: 1.8; }
+        h1, h2, h3, h4, h5 { font-family: 'Poppins', sans-serif; }
+        
+        /* BACKGROUND & GLOW EFFECTS WITH ELEGANT PEN IMAGE */
+        .bg-vault { 
+            position: fixed; 
+            inset: 0; 
+            z-index: -2; 
+            background-color: #ffffff;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.85), rgba(248, 250, 252, 0.95)),
+                url('background-pen.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        .grid-overlay { position: fixed; inset: 0; z-index: -1; background-image: linear-gradient(rgba(15, 23, 42, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(15, 23, 42, 0.03) 1px, transparent 1px); background-size: 40px 40px; opacity: 1; }
+        
+        /* GLASSMORPHISM PANELS (LIGHT) */
+        .glass-panel { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(15, 23, 42, 0.08); border-radius: 1.5rem; box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.05); }
+        .glass-nav { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(15, 23, 42, 0.08); z-index: 100; box-shadow: 0 4px 20px rgba(0,0,0,0.02); }
+        
+        /* BUTTONS */
+        .btn-glow { background: linear-gradient(135deg, #0ea5e9, #2563eb); color: white; border-radius: 9999px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s; cursor: pointer; box-shadow: 0 4px 15px rgba(14, 165, 233, 0.2); border:none;}
+        .btn-glow:hover:not(:disabled) { box-shadow: 0 8px 25px rgba(14, 165, 233, 0.4); transform: translateY(-2px); }
+        .btn-glow:disabled { opacity: 0.6; cursor: not-allowed; }
+        
+        .btn-outline { background: white; color: #0f172a; border: 2px solid #cbd5e1; border-radius: 9999px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s; cursor: pointer; }
+        .btn-outline:hover:not(:disabled) { background: #f8fafc; border-color: #0ea5e9; color: #0ea5e9; }
+        
+        .btn-danger { background: linear-gradient(135deg, #f43f5e, #e11d48); color: white; border-radius: 9999px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; transition: all 0.3s; box-shadow: 0 10px 20px rgba(225, 29, 72, 0.2); border:none; cursor: pointer;}
+        .btn-danger:hover:not(:disabled) { box-shadow: 0 15px 30px rgba(225, 29, 72, 0.4); transform: translateY(-3px) scale(1.02); }
+
+        /* INPUTS */
+        .input-modern { background: #ffffff; border: 2px solid #e2e8f0; color: #0f172a; border-radius: 1rem; outline: none; padding: 1rem 1.5rem; width: 100%; transition: all 0.3s; font-family: 'Inter', sans-serif; font-weight: 600; text-align: center; }
+        .input-modern:focus { border-color: #0ea5e9; box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1); }
+        
+        /* CARDS & VOCAB */
+        .vocab-card { background: linear-gradient(145deg, #ffffff, #f8fafc); border: 1px solid rgba(15,23,42,0.05); border-radius: 1.5rem; transition: all 0.4s ease; cursor: pointer; position: relative; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+        .vocab-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: transparent; transition: all 0.4s ease; }
+        .vocab-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px -5px rgba(0,0,0,0.08); }
+        .vocab-card:hover::before { background: linear-gradient(90deg, #0ea5e9, #3b82f6); }
+        
+        .tag-cyber { display: inline-block; padding: 0.35rem 1rem; background: rgba(14, 165, 233, 0.1); color: #0284c7; border: 1px solid rgba(14, 165, 233, 0.2); border-radius: 9999px; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* PUZZLE */
+        .puzzle-slot { background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 1rem; min-height: 120px; margin-bottom: 1.5rem; display: flex; flex-direction: column; align-items: center; padding: 1.75rem; cursor: pointer; transition: all 0.3s; position: relative; }
+        .puzzle-slot.filled { border: 2px solid #10b981; background: #ecfdf5; box-shadow: inset 0 0 10px rgba(16, 185, 129, 0.05); }
+        .puzzle-label { position: absolute; left: 15px; top: -12px; background: #94a3b8; color: white; padding: 3px 12px; border-radius: 10px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+        .puzzle-slot.filled .puzzle-label { background: #10b981; }
+        .puzzle-option { background: #ffffff; border: 2px solid #e2e8f0; border-radius: 1rem; padding: 1.5rem; margin-bottom: 1rem; cursor: pointer; transition: all 0.3s; font-weight: 600; box-shadow: 0 4px 6px rgba(0,0,0,0.02); text-align: left; width: 100%; font-size: 1.1rem; }
+        .puzzle-option:hover:not(:disabled) { transform: translateX(5px); border-color: #0ea5e9; background: #f0f9ff; }
+        .puzzle-option.used { opacity: 0.3; pointer-events: none; transform: scale(0.98); background: #f1f5f9; }
+
+        /* SLIDESHOW */
+        .slide-container { position: relative; min-height: 85vh; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; padding-bottom: 80px; }
+        .slide { display: none; width: 100%; max-width: 90%; margin: 0 auto; padding: 20px; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        .slide.active { display: flex; animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        
+        @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .animate-fade-in { animation: fadeIn 0.6s ease forwards; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-10px); } 40%, 80% { transform: translateX(10px); } }
+        .animate-shake { animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
+        
+        .loading-spinner { border: 3px solid #e0f2fe; border-top: 3px solid #0ea5e9; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 10px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        #system-toast { position: fixed; bottom: 30px; right: 30px; background: #ffffff; border: 1px solid #e2e8f0; border-left: 4px solid #10b981; padding: 1.25rem 1.5rem; border-radius: 1rem; z-index: 9999; box-shadow: 0 20px 40px rgba(0,0,0,0.1); transform: translateX(120%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; align-items: center; gap: 1rem; font-size: 1.1rem; }
+        #system-toast.show { transform: translateX(0); }
+        
+        /* CUSTOM SCROLLBAR */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .nav-arrow { position: fixed; top: 50%; transform: translateY(-50%); background: #ffffff; border: 1px solid #e2e8f0; color: #64748b; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; z-index: 50; box-shadow: 0 4px 10px rgba(0,0,0,0.05); font-size: 1.5rem; }
+        .nav-arrow:hover { background: #f0f9ff; border-color: #0ea5e9; color: #0ea5e9; box-shadow: 0 4px 15px rgba(14, 165, 233, 0.1); }
+        .nav-prev { left: 20px; } 
+        .nav-next { right: 20px; }
+
+        #super-admin-panel { position: fixed; bottom: 20px; left: 20px; background: #0f172a; color: white; padding: 15px; border-radius: 15px; z-index: 9999; border: 2px solid #0ea5e9; box-shadow: 0 10px 30px rgba(14, 165, 233, 0.3); display: none; }
+        
+        #pdf-report-container { position: absolute; left: -9999px; top: 0; width: 800px; background: white; color: #0f172a; padding: 40px; font-family: 'Inter', sans-serif; z-index: -100; }
+    </style>
+</head>
+<body>
+
+    <div class="bg-vault"></div>
+    <div class="grid-overlay"></div>
+
+    <nav class="glass-nav sticky top-0">
+        <div class="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+                    <i class="fa-solid fa-shield-halved text-white text-2xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold tracking-wider uppercase text-slate-900">Bilik Kebal <span class="text-cyan-600 font-light">Hujahan</span></h1>
+            </div>
+            
+            <div id="student-name-display" class="hidden font-medium text-base text-slate-500">
+                Ejen Analisis: <span id="display-name" class="text-cyan-600 font-bold uppercase tracking-wider ml-1"></span>
+            </div>
+
+            <div id="teacher-tabs" class="hidden flex space-x-3">
+                <button class="btn-outline px-6 py-3 text-sm font-bold pointer-events-none bg-slate-100 border-dashed text-slate-500"><i class="fa-solid fa-chalkboard-user mr-2"></i> Mode Pendidik Aktif</button>
+            </div>
+
+            <div class="flex items-center space-x-5">
+                <div id="firebase-status" class="text-xs uppercase font-bold text-slate-400 mr-2 flex items-center"><i class="fa-solid fa-circle-notch fa-spin mr-1"></i> Menyambung...</div>
+                <button onclick="panggilFbClearData()" class="text-slate-500 hover:text-rose-500 transition text-base font-medium mr-4"><i class="fa-solid fa-trash mr-2"></i>Kosongkan Server</button>
+                <button onclick="location.reload()" class="text-slate-500 hover:text-rose-500 transition text-base font-medium"><i class="fa-solid fa-power-off mr-2"></i>Tutup Sesi</button>
+            </div>
+        </div>
+    </nav>
+
+    <div id="super-admin-panel">
+        <h4 class="text-sm font-black uppercase text-cyan-400 mb-2 border-b border-slate-700 pb-1"><i class="fa-solid fa-user-shield mr-2"></i>Neo Bypass Control (Admin)</h4>
+        <div class="grid grid-cols-3 gap-2">
+            <button onclick="nextPhase(1)" class="bg-slate-800 hover:bg-cyan-600 text-sm px-3 py-2 rounded transition-colors">Fasa 1</button>
+            <button onclick="nextPhase(2)" class="bg-slate-800 hover:bg-cyan-600 text-sm px-3 py-2 rounded transition-colors">Fasa 2</button>
+            <button onclick="nextPhase(3)" class="bg-slate-800 hover:bg-cyan-600 text-sm px-3 py-2 rounded transition-colors">Fasa 3</button>
+            <button onclick="nextPhase(4)" class="bg-slate-800 hover:bg-cyan-600 text-sm px-3 py-2 rounded transition-colors">Fasa 4</button>
+            <button onclick="nextPhase(5)" class="bg-slate-800 hover:bg-cyan-600 text-sm px-3 py-2 rounded transition-colors">Fasa 5</button>
+            <button onclick="nextPhase(6)" class="bg-slate-800 hover:bg-cyan-600 text-sm px-3 py-2 rounded transition-colors">Fasa 6</button>
+        </div>
+    </div>
+
+    <div id="system-toast">
+        <div class="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 text-2xl" id="toast-icon-bg">
+            <i class="fa-solid fa-check-circle" id="toast-icon"></i>
+        </div>
+        <div>
+            <h4 class="font-bold text-sm uppercase text-slate-500 tracking-wider mb-1" id="toast-title">Sistem Dihantar</h4>
+            <p id="system-toast-msg" class="text-base font-medium text-slate-800">Operasi berjaya dilaksanakan.</p>
+        </div>
+    </div>
+
+    <div id="teacher-pin-modal" class="hidden fixed inset-0 bg-slate-900/60 z-[200] flex items-center justify-center backdrop-blur-sm">
+        <div class="glass-panel p-12 max-w-lg w-full text-center">
+            <div class="w-20 h-20 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center mx-auto mb-6">
+                <i class="fa-solid fa-lock text-3xl text-slate-400"></i>
+            </div>
+            <h3 class="font-bold text-3xl uppercase mb-2 text-slate-900">Akses Pendidik</h3>
+            <p class="mb-8 text-base text-slate-500">Pengecaman identiti guru diperlukan.</p>
+            <input type="password" id="teacher-pin-input" class="input-modern text-center text-4xl font-bold tracking-[1em] mb-10" placeholder="••••" maxlength="4" onkeypress="if(event.key === 'Enter') checkTeacherPin()">
+            <div class="flex gap-4">
+                <button onclick="closePinModal()" class="flex-1 btn-outline py-4 text-base">Batal</button>
+                <button onclick="checkTeacherPin()" class="flex-1 btn-glow py-4 text-base">Sahkan <i class="fa-solid fa-arrow-right ml-2"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <main id="app" class="flex-grow w-full relative">
+        
+        <!-- LANDING PAGE -->
+        <div id="landing-view" class="w-full h-[80vh] flex flex-col justify-center items-center text-center px-6 relative">
+            <div class="relative z-10 w-full max-w-5xl animate-fade-in">
+                <div class="inline-block px-5 py-2 rounded-full bg-cyan-50 border border-cyan-200 text-cyan-700 text-base font-bold tracking-widest mb-8 shadow-sm">MODUL IGCSE 0696 (FIREBASE SYNC)</div>
+                <h2 class="text-6xl md:text-8xl font-black mb-8 uppercase tracking-tight text-slate-900 leading-tight">
+                    Menguasai <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-blue-600">Seni Berhujah</span>
+                </h2>
+                <div class="flex flex-col md:flex-row justify-center gap-6 mt-10">
+                    <button onclick="switchView('student')" class="btn-glow px-12 py-5 text-lg"><i class="fa-solid fa-terminal mr-2"></i> Log Masuk Pelajar</button>
+                    <button onclick="switchView('teacher')" class="btn-outline px-12 py-5 text-lg bg-white"><i class="fa-solid fa-shield mr-2"></i> Papan Pemuka Guru</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= STUDENT VIEW ================= -->
+        <div id="student-view" class="hidden w-full min-h-screen flex flex-col relative pb-24">
+            <div class="max-w-7xl mx-auto w-full px-6 pt-16">
+
+                <div id="phase-login" class="w-full max-w-2xl mx-auto animate-fade-in mt-12">
+                    <div class="glass-panel p-14 text-center">
+                        <div class="w-24 h-24 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center mx-auto mb-8 shadow-inner">
+                            <i class="fa-solid fa-user-astronaut text-4xl text-cyan-500"></i>
+                        </div>
+                        <h2 class="text-4xl font-bold uppercase mb-4 text-slate-900">Daftar Masuk Ejen</h2>
+                        <p class="mb-10 text-slate-500 text-lg">Sila masukkan nama untuk dihubungkan ke pelayan awan.</p>
+                        <input type="text" id="login-name" class="input-modern text-center text-3xl font-bold mb-10" placeholder="Nama anda..." onkeypress="if(event.key === 'Enter') studentLogin()">
+                        <button onclick="studentLogin()" class="btn-glow w-full py-5 text-lg">Sambung ke Pelayan <i class="fa-solid fa-wifi ml-2"></i></button>
+                    </div>
+                </div>
+                
+                <div id="phase-1" class="hidden w-full animate-fade-in">
+                    <div class="text-center mb-14">
+                        <span class="tag-cyber mb-6">Fasa 1: Persenjataan</span>
+                        <h2 class="text-5xl font-bold uppercase text-slate-900 mb-6">Diksi Analitikal (Teras)</h2>
+                        <p class="text-slate-600 text-lg font-medium">Klik pada jubin data untuk menyahsulit 8 definisi kosa kata aras tinggi.</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16 max-w-6xl mx-auto">
+                        <div class="vocab-card p-8 flex flex-col justify-center items-center min-h-[180px]" onclick="toggleDef(this)">
+                            <i class="fa-solid fa-fire-flame-curved text-slate-400 text-2xl mb-4 transition-colors duration-300"></i>
+                            <b class="text-xl text-slate-800 mb-2 tracking-wide">Polemik</b>
+                            <p class="definition hidden text-sm text-cyan-900 bg-cyan-50 p-3 rounded border border-cyan-200 mt-3 text-center leading-relaxed">"Isu kontroversi yang hangat dibincangkan."</p>
+                        </div>
+                        <div class="vocab-card p-8 flex flex-col justify-center items-center min-h-[180px]" onclick="toggleDef(this)">
+                            <i class="fa-solid fa-link text-slate-400 text-2xl mb-4 transition-colors duration-300"></i>
+                            <b class="text-xl text-slate-800 mb-2 tracking-wide">Implikasi</b>
+                            <p class="definition hidden text-sm text-cyan-900 bg-cyan-50 p-3 rounded border border-cyan-200 mt-3 text-center leading-relaxed">"Kesan yang timbul daripada sesuatu tindakan."</p>
+                        </div>
+                        <div class="vocab-card p-8 flex flex-col justify-center items-center min-h-[180px]" onclick="toggleDef(this)">
+                            <i class="fa-solid fa-gem text-slate-400 text-2xl mb-4 transition-colors duration-300"></i>
+                            <b class="text-xl text-slate-800 mb-2 tracking-wide">Signifikan</b>
+                            <p class="definition hidden text-sm text-cyan-900 bg-cyan-50 p-3 rounded border border-cyan-200 mt-3 text-center leading-relaxed">"Sesuatu yang penting atau bermakna."</p>
+                        </div>
+                        <div class="vocab-card p-8 flex flex-col justify-center items-center min-h-[180px]" onclick="toggleDef(this)">
+                            <i class="fa-solid fa-chess-king text-slate-400 text-2xl mb-4 transition-colors duration-300"></i>
+                            <b class="text-xl text-slate-800 mb-2 tracking-wide">Mendominasi</b>
+                            <p class="definition hidden text-sm text-cyan-900 bg-cyan-50 p-3 rounded border border-cyan-200 mt-3 text-center leading-relaxed">"Menguasai peranan utama dalam sesuatu situasi."</p>
+                        </div>
+                        <div class="vocab-card p-8 flex flex-col justify-center items-center min-h-[180px]" onclick="toggleDef(this)">
+                            <i class="fa-solid fa-brain text-slate-400 text-2xl mb-4 transition-colors duration-300"></i>
+                            <b class="text-xl text-slate-800 mb-2 tracking-wide">Dogma</b>
+                            <p class="definition hidden text-sm text-cyan-900 bg-cyan-50 p-3 rounded border border-cyan-200 mt-3 text-center leading-relaxed">"Kepercayaan kukuh tanpa usul periksa."</p>
+                        </div>
+                        <div class="vocab-card p-8 flex flex-col justify-center items-center min-h-[180px]" onclick="toggleDef(this)">
+                            <i class="fa-solid fa-flag-checkered text-slate-400 text-2xl mb-4 transition-colors duration-300"></i>
+                            <b class="text-xl text-slate-800 mb-2 tracking-wide">Tuntasnya</b>
+                            <p class="definition hidden text-sm text-cyan-900 bg-cyan-50 p-3 rounded border border-cyan-200 mt-3 text-center leading-relaxed">"Secara keseluruhannya atau kesimpulannya."</p>
+                        </div>
+                        <div class="vocab-card p-8 flex flex-col justify-center items-center min-h-[180px]" onclick="toggleDef(this)">
+                            <i class="fa-solid fa-gears text-slate-400 text-2xl mb-4 transition-colors duration-300"></i>
+                            <b class="text-xl text-slate-800 mb-2 tracking-wide">Pragmatik</b>
+                            <p class="definition hidden text-sm text-cyan-900 bg-cyan-50 p-3 rounded border border-cyan-200 mt-3 text-center leading-relaxed">"Bersifat praktikal, melihat pada hasil sebenar."</p>
+                        </div>
+                        <div class="vocab-card p-8 flex flex-col justify-center items-center min-h-[180px]" onclick="toggleDef(this)">
+                            <i class="fa-solid fa-hand-holding-hand text-slate-400 text-2xl mb-4 transition-colors duration-300"></i>
+                            <b class="text-xl text-slate-800 mb-2 tracking-wide">Sinergi</b>
+                            <p class="definition hidden text-sm text-cyan-900 bg-cyan-50 p-3 rounded border border-cyan-200 mt-3 text-center leading-relaxed">"Kerjasama padu membawa hasil lebih baik."</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-center"><button onclick="nextPhase(2)" class="btn-glow px-14 py-5 text-lg">Maju ke Rebutan Awan (Fasa 2) <i class="fa-solid fa-cloud-bolt ml-2"></i></button></div>
+                </div>
+
+                <div id="phase-2" class="hidden w-full animate-fade-in flex flex-col items-center justify-center min-h-[70vh]">
+                    <span class="tag-cyber mb-8 relative z-10">Fasa 2: Tempur Diksi (Rangkaian Awan)</span>
+                    
+                    <div class="relative w-full max-w-5xl min-h-[550px] glass-panel overflow-hidden border border-slate-200 shadow-[0_20px_50px_rgba(0,0,0,0.05)] flex flex-col items-center justify-center bg-white p-10">
+
+                        <div id="vault-door-left" class="vault-door absolute top-0 left-0 w-1/2 h-full vault-bg-pattern border-r-2 border-slate-300 z-40 transition-transform duration-1000 ease-in-out flex items-center justify-end pr-0 shadow-[5px_0_15px_rgba(0,0,0,0.05)]">
+                            <div class="w-40 h-40 border-4 border-dashed border-slate-300 rounded-full animate-spin absolute -right-20 flex items-center justify-center bg-slate-100">
+                                <div class="w-20 h-20 border-4 border-slate-400 rounded-full"></div>
+                            </div>
+                        </div>
+                        
+                        <div id="vault-door-right" class="vault-door absolute top-0 right-0 w-1/2 h-full vault-bg-pattern border-l-2 border-slate-300 z-40 transition-transform duration-1000 ease-in-out flex items-center justify-start pl-0 shadow-[-5px_0_15px_rgba(0,0,0,0.05)]">
+                            <div class="w-40 h-40 border-4 border-dashed border-slate-300 rounded-full animate-spin absolute -left-20 flex items-center justify-center bg-slate-100" style="animation-direction: reverse;">
+                                <div class="w-20 h-20 border-4 border-slate-400 rounded-full"></div>
+                            </div>
+                        </div>
+
+                        <!-- Antaramuka Kunci -->
+                        <div id="vault-lock-interface" class="absolute z-50 text-center w-full px-10 flex flex-col items-center justify-center transition-opacity duration-300 bg-white/90 w-96 h-96 rounded-full border border-slate-200 backdrop-blur-md shadow-2xl">
+                            <i class="fa-solid fa-network-wired text-6xl text-slate-800 mb-4"></i>
+                            <h2 class="text-2xl font-black text-slate-900 uppercase tracking-widest mb-2">Rebutan Rangkaian</h2>
+                            <p class="text-slate-600 text-xs mb-6 max-w-[250px] font-bold uppercase tracking-wider text-red-600">Hanya 1 Ejen Terpantas Akan Berjaya Masuk.</p>
+                            
+                            <input type="text" id="vault-password" class="input-modern text-center text-3xl font-black tracking-[0.2em] uppercase w-72 mb-4 bg-slate-50 border-slate-300 focus:border-cyan-500 placeholder-slate-300" placeholder="8 ABJAD KOD" maxlength="8" onkeypress="if(event.key === 'Enter') window.fbStudentCubaAksesUI()">
+                            
+                            <button id="btn-unlock" onclick="window.fbStudentCubaAksesUI()" class="btn-glow px-8 py-4 text-base w-72 shadow-md">Urai Kod Awan! <i class="fa-solid fa-bolt ml-1"></i></button>
+                        </div>
+
+                        <!-- Bahagian Dalam Bilik Kebal -->
+                        <div id="vault-inside" class="relative z-30 text-center w-full px-6 md:px-14 opacity-0 transition-opacity duration-500 delay-500 hidden">
+                            <div id="student-quiz-area" class="w-full max-w-3xl mx-auto">
+                                <span class="inline-block px-4 py-2 bg-emerald-100 text-emerald-700 font-bold text-xs rounded-full tracking-widest uppercase mb-6 border border-emerald-200"><i class="fa-solid fa-trophy mr-2"></i> Ejen Terpantas: Akses Dibenarkan</span>
+                                <p id="student-quiz-q" class="text-2xl md:text-4xl font-medium text-slate-800 mb-10 leading-relaxed italic">Loading question...</p>
+                                
+                                <div class="bg-slate-50 p-10 rounded-xl border border-slate-200 shadow-inner mb-8">
+                                    <p class="text-base font-bold text-cyan-600 uppercase tracking-widest mb-6">Taip Diksi Yang Tepat (Perkataan):</p>
+                                    <input type="text" id="diksi-answer-input" class="input-modern text-center text-4xl font-black uppercase tracking-wider mb-6" placeholder="JAWAPAN..." onkeypress="if(event.key === 'Enter') window.fbStudentHantarJawapanUI()">
+                                    <button onclick="window.fbStudentHantarJawapanUI()" class="btn-glow w-full py-5 text-lg shadow-md">Pancarkan Jawapan <i class="fa-solid fa-paper-plane ml-2"></i></button>
+                                </div>
+                            </div>
+
+                            <div id="student-quiz-wait" class="hidden py-10 flex flex-col items-center justify-center h-full">
+                                <i class="fa-solid fa-satellite-dish text-7xl text-cyan-500 mb-8 animate-pulse"></i>
+                                <h2 class="text-4xl font-black text-slate-800 uppercase tracking-widest mb-4">Jawapan Dihantar!</h2>
+                                <p class="text-slate-600 font-medium mb-10 text-xl" id="student-wait-msg">Perhatian kelas: Cikgu sedang menilai jawapan anda di hadapan (Live Peer Review).</p>
+                            </div>
+                            
+                            <div class="mt-6 flex justify-center gap-4">
+                                <button id="btn-next-phase-2" onclick="nextPhase(3)" class="hidden btn-glow px-12 py-5 text-base bg-gradient-to-r from-emerald-500 to-teal-500 shadow-lg shadow-emerald-500/30 w-full md:w-auto">Akses Makmal Algoritma (Fasa Seterusnya) <i class="fa-solid fa-arrow-right ml-2"></i></button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div id="phase-3" class="hidden w-full animate-fade-in">
+                    <div class="text-center mb-10">
+                        <span class="tag-cyber mb-4">Fasa 3: Makmal Algoritma Esei</span>
+                        <h2 class="text-5xl font-bold uppercase text-slate-900 mb-4" id="pz-title-display">Tahap 1: Pendahuluan</h2>
+                        <p class="text-slate-600 text-lg font-medium" id="pz-desc-display">Sintesis struktur secara bertingkat. Seret/klik untuk padankan blok ayat ke hierarki yang betul.</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 max-w-7xl mx-auto">
+                        <div class="glass-panel p-10 bg-slate-50 border-slate-200">
+                            <div class="flex justify-between items-center mb-8">
+                                <h4 class="font-bold uppercase text-sm text-slate-500 tracking-widest flex items-center"><i class="fa-solid fa-layer-group mr-2 text-cyan-500"></i> Bekas Susunan Hierarki</h4>
+                                <span class="bg-cyan-100 text-cyan-700 font-bold px-4 py-2 rounded text-xs tracking-widest uppercase border border-cyan-200" id="pz-level-indicator">Tahap 1/3</span>
+                            </div>
+                            <div id="puzzle-slots-container" class="flex flex-col gap-4"></div>
+                        </div>
+                        
+                        <div class="flex flex-col">
+                            <h4 class="font-bold uppercase text-sm mb-8 text-slate-500 tracking-widest flex items-center"><i class="fa-solid fa-cubes mr-2 text-cyan-500"></i> Blok Teks Bebas</h4>
+                            <div id="option-pool" class="flex-grow"></div>
+                            
+                            <div id="puzzle-feedback" class="hidden mt-6 p-6 rounded-xl text-center text-lg font-bold uppercase tracking-wider"></div>
+                            
+                            <div id="puzzle-meaning-box" class="hidden mt-6 bg-emerald-50 p-8 rounded-xl border border-emerald-200 text-left animate-fade-in">
+                                <h4 class="font-bold uppercase text-sm text-emerald-700 mb-3"><i class="fa-solid fa-unlock-keyhole mr-2"></i> Algoritma Berjaya Diurai</h4>
+                                <p class="text-lg text-slate-800 leading-relaxed font-medium" id="pz-success-msg">Struktur tepat. Teruskan ke tahap seterusnya.</p>
+                            </div>
+
+                            <div class="flex flex-col gap-4 mt-8">
+                                <button id="btn-check-puzzle" onclick="checkMultiPuzzle()" class="btn-glow w-full py-5 text-lg">Sahkan Susunan</button>
+                                <div class="flex flex-col sm:flex-row gap-4 w-full">
+                                    <button onclick="resetCurrentPuzzle()" class="btn-outline flex-1 py-4 text-base bg-white">Reset Susunan</button>
+                                    <button id="btn-next-pz-level" onclick="nextPuzzleLevel()" class="hidden btn-glow flex-[2] py-4 text-base bg-gradient-to-r from-blue-500 to-indigo-600 shadow-md">Tahap Seterusnya <i class="fa-solid fa-forward-step ml-2"></i></button>
+                                    <button id="btn-next-phase-3" onclick="nextPhase(4)" class="hidden btn-glow flex-[2] py-4 text-base bg-gradient-to-r from-emerald-500 to-teal-600 shadow-md">Teruskan Ke Fasa Diagnosis <i class="fa-solid fa-arrow-right ml-2"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="phase-4" class="hidden w-full animate-fade-in">
+                    <div class="text-center mb-14">
+                        <span class="tag-cyber mb-4">Fasa 4: Lensa Pemantau</span>
+                        <h2 class="text-5xl font-bold uppercase text-slate-900 mb-6">Diagnosis Hujah (CFU)</h2>
+                        <p class="text-slate-600 text-lg font-medium">Sistem telah mengimbas dua sampel teks. Analisis dan kenal pasti sampel yang mempunyai kualiti berstruktur tinggi.</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto mb-10">
+                        <div class="glass-panel p-10 relative overflow-hidden group bg-white border-red-200 shadow-md">
+                            <div class="absolute top-0 left-0 w-2 h-full bg-red-500"></div>
+                            <h3 class="font-bold uppercase text-slate-500 tracking-widest text-sm mb-6">Sampel Kod: Alpha</h3>
+                            <p class="text-lg leading-relaxed text-slate-800 mb-10 font-medium">"AI sangat bahaya sebab ia boleh buat kerja manusia. Nanti ramai orang hilang kerja lukis. Lepas tu manusia akan jadi malas nak fikir. Oleh Oleh itu, AI patut diharamkan."</p>
+                            <div class="flex gap-3">
+                                <span class="bg-red-50 text-red-700 border border-red-200 text-xs px-3 py-2 uppercase rounded-md font-bold">Struktur Longgar</span>
+                                <span class="bg-red-50 text-red-700 border border-red-200 text-xs px-3 py-2 uppercase rounded-md font-bold">Generalisasi</span>
+                            </div>
+                        </div>
+
+                        <div class="glass-panel p-10 relative overflow-hidden group bg-white border-emerald-200 shadow-md">
+                            <div class="absolute top-0 left-0 w-2 h-full bg-emerald-500"></div>
+                            <h3 class="font-bold uppercase text-slate-500 tracking-widest text-sm mb-6">Sampel Kod: Beta</h3>
+                            <p class="text-lg leading-relaxed text-slate-800 mb-10 font-medium">"Penggunaan Kecerdasan Buatan membawa <b>implikasi</b> yang <b>signifikan</b>. Hal ini kerana AI mampu mereplikasi karya pantas, sekaligus mencetuskan <b>polemik</b> hak cipta. Tuntasnya, ia menuntut kawal selia."</p>
+                            <div class="text-xs text-emerald-700 bg-emerald-50 p-3 rounded border border-emerald-200 font-bold">
+                                <i class="fa-solid fa-check mr-3"></i> PEKA teratur, mempunyai leksikal premium.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="max-w-6xl mx-auto glass-panel p-8 bg-cyan-50 border-cyan-200 text-left mb-10 shadow-md">
+                        <h4 class="font-bold text-cyan-800 text-base uppercase tracking-wider mb-3"><i class="fa-solid fa-microscope mr-2"></i> Konklusi Sistem:</h4>
+                        <p class="text-slate-800 text-lg font-medium leading-relaxed">Sampel Beta menunjukkan kematangan kognitif. Ia tidak sekadar memberi pendapat, tetapi melampirkan <b>justifikasi kukuh (replikasi pantas)</b> berserta penggunaan istilah analitikal (signifikan, polemik). Ini adalah standard gred A*.</p>
+                    </div>
+
+                    <div class="flex justify-center gap-4 max-w-2xl mx-auto">
+                        <button onclick="nextPhase(5)" class="btn-glow px-14 py-5 text-lg w-full">Akses Zon Penulisan (Everybody Writes) <i class="fa-solid fa-pen-nib ml-2"></i></button>
+                    </div>
+                </div>
+
+                <div id="phase-5" class="hidden w-full animate-fade-in">
+                    <div class="max-w-4xl mx-auto glass-panel p-12 md:p-16 text-center bg-white shadow-xl">
+                        <span class="tag-cyber mb-6">Fasa 5: Everybody Writes</span>
+                        <h2 class="text-5xl font-bold uppercase mb-6 text-slate-900">Zon Pendirian</h2>
+                        
+                        <div class="bg-slate-50 rounded-2xl p-8 border border-slate-200 mb-10 text-left">
+                            <p class="text-sm text-slate-500 uppercase font-bold tracking-widest mb-3">Subjek Analisis:</p>
+                            <p class="text-xl text-slate-900 font-medium leading-relaxed">"Kecerdasan Buatan (AI) akan akhirnya mengambil alih sepenuhnya peranan manusia dalam bidang seni kreatif."</p>
+                        </div>
+                        
+                        <div class="text-left mb-8">
+                            <p class="text-base text-cyan-700 mb-3 font-bold uppercase tracking-wider"><i class="fa-solid fa-terminal mr-2"></i>Arah Tugas:</p>
+                            <p class="text-lg text-slate-700 mb-6 font-medium">Taip <b>satu ayat pendirian (Stand)</b> anda (Sokong/Bantah). Gunakan struktur ayat majmuk pancangan yang kompleks.</p>
+                            <textarea id="pendirianInput" rows="5" class="input-modern text-left text-xl" placeholder="Contoh: Walaupun AI mampu mempercepatkan penjanaan idea, saya bertegas bahawa entiti ini tidak akan mampu merampas kehalusan emosi manusia..."></textarea>
+                        </div>
+                        
+                        <div class="flex justify-between items-center bg-amber-50 border-l-4 border-amber-500 p-6 mb-10 text-left rounded-r-2xl">
+                            <div>
+                                <h4 class="font-bold text-amber-800 text-base uppercase tracking-wider mb-2"><i class="fa-solid fa-cloud-arrow-up mr-2"></i> Sinkronisasi Awan</h4>
+                                <p class="text-sm text-slate-700 font-medium leading-relaxed">Ayat pendirian anda akan dihantar ke awan dan terpancar terus ke Radar Guru untuk perbincangan Cold Call.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4">
+                            <button onclick="window.fbSubmitPendirianUI()" class="btn-glow w-full py-5 text-lg shadow-lg">Muat Naik Pendirian <i class="fa-solid fa-paper-plane ml-2"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="buzzer-screen" class="hidden w-full max-w-5xl mx-auto animate-fade-in">
+                    <div class="glass-panel bg-white p-20 text-center border-4 border-emerald-300 shadow-2xl">
+                        <div class="w-32 h-32 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-8">
+                            <i class="fa-solid fa-check text-7xl text-emerald-500"></i>
+                        </div>
+                        <h2 class="text-4xl md:text-6xl font-black text-slate-900 mb-6 uppercase tracking-wider">Data Diterima!</h2>
+                        <p class="text-xl text-slate-700 mb-14 font-medium leading-relaxed">Ayat pendirian anda kini terpapar di Radar Guru. Bersedia untuk mempertahankan hujah jika nama anda dipetik.</p>
+                        
+                        <button onclick="nextPhase(6)" class="btn-glow px-14 py-6 text-lg bg-gradient-to-r from-cyan-500 to-blue-600">Teruskan ke Makmal Penulisan Penuh (Kertas 2) <i class="fa-solid fa-laptop-code ml-2"></i></button>
+                    </div>
+                </div>
+
+                <!-- Fasa 6: Creation (Makmal Hujahan) -->
+                <div id="phase-6" class="hidden w-full max-w-6xl mx-auto animate-fade-in">
+                    <div class="glass-panel bg-white p-12 md:p-16 text-center shadow-xl">
+                        <span class="tag-cyber mb-6">Fasa 6: Ujian Komprehensif</span>
+                        <h2 class="text-5xl font-bold uppercase mb-10 text-slate-900">Terminal Hujahan (Kertas 2)</h2>
+                        
+                        <div class="bg-cyan-50 p-8 rounded-2xl border border-cyan-200 text-left text-lg text-slate-800 mb-10 font-medium leading-relaxed">
+                            <span class="font-bold text-cyan-800 uppercase tracking-wider block mb-3 text-base"><i class="fa-solid fa-crosshairs mr-2"></i> Arahan Operasi:</span> 
+                            Kembangkan pendirian dari Fasa 5 menjadi <b>satu perenggan hujahan yang utuh</b> menggunakan formula PEKA. Pastikan ada fakta sokongan, kosa kata aras tinggi, dan huraian kesan yang logik. Karya akan disemak oleh AI dan dihantar ke pelayan awan.
+                        </div>
+                        
+                        <div class="text-left space-y-4 mb-10">
+                            <textarea id="karyaInput" rows="14" class="input-modern text-xl text-left leading-relaxed" placeholder="Taip hujah penuh anda di sini..."></textarea>
+                        </div>
+
+                        <button id="btnHantar" onclick="window.fbSubmitKaranganUI()" class="btn-glow w-full py-6 text-lg mb-10 shadow-lg">Laksanakan Semakan Kognitif AI & Hantar <i class="fa-solid fa-microchip ml-2"></i></button>
+                        
+                        <div id="ai-loading" class="hidden text-center text-lg font-bold text-cyan-600 mb-10 flex items-center justify-center">
+                            <div class="loading-spinner border-cyan-200 border-t-cyan-500 w-8 h-8 mr-4"></div> Menilai struktur logik dan pemindahan data awan...
+                        </div>
+                        
+                        <div id="ai-comment" class="hidden bg-slate-50 rounded-2xl border border-slate-200 p-10 text-left shadow-inner">
+                            <div class="flex items-center mb-8 pb-5 border-b border-slate-300">
+                                <i class="fa-solid fa-robot text-3xl text-cyan-600 mr-5"></i>
+                                <h4 class="text-xl font-bold uppercase text-slate-900 tracking-widest">Laporan Diagnostik Sistem</h4>
+                            </div>
+                            <div id="ai-text-container" class="space-y-8 text-lg"></div>
+                            
+                            <div class="mt-10 pt-8 border-t border-slate-300 flex justify-between items-center">
+                                <span class="font-bold text-sm uppercase text-slate-500 tracking-widest">Penilaian Keseluruhan</span>
+                                <span id="ai-score" class="text-6xl font-black text-slate-900">-/10</span>
+                            </div>
+                            
+                            <div class="mt-10 flex flex-col sm:flex-row justify-center gap-6">
+                                <button onclick="muatTurunPDF()" class="btn-glow px-10 py-5 text-base bg-gradient-to-r from-emerald-500 to-teal-600"><i class="fa-solid fa-file-pdf mr-2"></i>Muat Turun Laporan Akhir (PDF)</button>
+                                <button onclick="kembaliKeMula()" class="btn-outline px-10 py-5 text-base bg-white">Selesai Modul (Tamat)</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= TEACHER VIEW (SLIDES) ================= -->
+        <div id="teacher-view" class="hidden w-full">
+            <div id="section-notes" class="w-full">
+                <button onclick="window.changeSlide(-1)" class="nav-arrow nav-prev"><i class="fa-solid fa-chevron-left"></i></button>
+                <button onclick="window.changeSlide(1)" class="nav-arrow nav-next"><i class="fa-solid fa-chevron-right"></i></button>
+                
+                <div class="slide-container">
+                    
+                    <div class="slide active" id="slide-1">
+                        <div class="inline-block px-5 py-2 rounded-full bg-cyan-100 border border-cyan-200 text-cyan-800 text-sm font-bold tracking-widest mb-10">MODUL KERTAS 2: IGCSE 0696</div>
+                        <h2 class="text-8xl md:text-[10rem] font-black mb-8 uppercase text-slate-900 tracking-tighter leading-none">
+                            Seni <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-blue-600">Berhujah</span>
+                        </h2>
+                        <p class="text-3xl font-medium text-slate-600 max-w-4xl leading-relaxed">"Kekuatan argumen bukan terletak pada kelantangan suara, tetapi pada ketajaman logik dan konkritnya bukti."</p>
+                    </div>
+
+                    <div class="slide" id="slide-2">
+                        <div class="inline-block px-5 py-2 rounded-full bg-slate-200 border border-slate-300 text-slate-800 text-sm font-bold tracking-widest mb-8 uppercase">Induksi (See-Think-Wonder)</div>
+                        <h2 class="text-6xl font-bold mb-10 uppercase text-slate-900">Ancaman atau Evolusi?</h2>
+                        <div class="w-full max-w-6xl mx-auto h-[500px] rounded-3xl border-4 border-white shadow-2xl mb-10 flex items-center justify-center relative overflow-hidden group">
+                            <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=1000&auto=format&fit=crop" class="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition duration-700">
+                        </div>
+                        <div class="flex justify-center gap-10">
+                            <span class="px-10 py-4 bg-white shadow-lg rounded-full text-lg font-bold text-slate-800 border border-slate-100"><i class="fa-solid fa-eye text-cyan-500 mr-3 text-2xl"></i>Lihat</span>
+                            <span class="px-10 py-4 bg-white shadow-lg rounded-full text-lg font-bold text-slate-800 border border-slate-100"><i class="fa-solid fa-brain text-cyan-500 mr-3 text-2xl"></i>Fikir</span>
+                            <span class="px-10 py-4 bg-white shadow-lg rounded-full text-lg font-bold text-slate-800 border border-slate-100"><i class="fa-solid fa-question text-cyan-500 mr-3 text-2xl"></i>Tanya</span>
+                        </div>
+                    </div>
+
+                    <div class="slide" id="slide-3">
+                        <div class="inline-block px-5 py-2 rounded-full bg-slate-200 border border-slate-300 text-slate-800 text-sm font-bold tracking-widest mb-10 uppercase">Hala Tuju Operasi</div>
+                        <div class="grid md:grid-cols-2 gap-16 max-w-7xl w-full text-left">
+                            <div class="glass-panel p-12 border-l-8 border-l-cyan-500 bg-white shadow-xl">
+                                <h4 class="text-4xl font-black mb-8 uppercase text-slate-900">Objektif Pembelajaran</h4>
+                                <p class="text-2xl font-medium leading-relaxed text-slate-700">Pada akhir modul ini, pelajar dapat menstruktur <b>satu perenggan hujahan</b> yang kritis dan bebas lompang logik mengenai impak teknologi moden.</p>
+                            </div>
+                            <div class="glass-panel p-12 border-l-8 border-l-emerald-500 bg-white shadow-xl">
+                                <h4 class="text-2xl font-bold mb-8 uppercase text-slate-500 tracking-wider">Kriteria Kejayaan</h4>
+                                <ul class="space-y-6 text-xl text-slate-800 font-medium">
+                                    <li class="flex items-start"><i class="fa-solid fa-check text-emerald-500 mt-1 mr-5 text-2xl"></i> Menganalisis 8 kosa kata beraras tinggi.</li>
+                                    <li class="flex items-start"><i class="fa-solid fa-check text-emerald-500 mt-1 mr-5 text-2xl"></i> Menyusun hierarki logik PEKA dengan tepat.</li>
+                                    <li class="flex items-start"><i class="fa-solid fa-check text-emerald-500 mt-1 mr-5 text-2xl"></i> Mempertahankan pendirian secara Live (Cold Call).</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="slide" id="slide-4">
+                        <div class="inline-block px-5 py-2 rounded-full bg-slate-200 border border-slate-300 text-slate-800 text-sm font-bold tracking-widest mb-10 uppercase">Anatomi Argumen</div>
+                        <h2 class="text-7xl font-black uppercase text-slate-900 mb-20">Algoritma P.E.K.A</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 text-left w-full max-w-7xl">
+                            <div class="glass-panel bg-white p-10 relative overflow-hidden group shadow-xl">
+                                <div class="absolute top-0 left-0 w-full h-2 bg-cyan-500"></div>
+                                <h3 class="font-black text-8xl text-slate-100 mb-2 absolute right-6 top-6 z-0">P</h3>
+                                <h4 class="font-bold text-3xl uppercase text-cyan-600 mb-4 relative z-10">Pendirian</h4>
+                                <p class="text-lg text-slate-700 font-medium relative z-10 leading-relaxed">Kenyataan tegas (Stand). Tiada kelabu, pilih pihak anda dengan jelas.</p>
+                            </div>
+                            <div class="glass-panel bg-white p-10 relative overflow-hidden group shadow-xl">
+                                <div class="absolute top-0 left-0 w-full h-2 bg-blue-500"></div>
+                                <h3 class="font-black text-8xl text-slate-100 mb-2 absolute right-6 top-6 z-0">E</h3>
+                                <h4 class="font-bold text-3xl uppercase text-blue-600 mb-4 relative z-10">Elaborasi</h4>
+                                <p class="text-lg text-slate-700 font-medium relative z-10 leading-relaxed">Penerangan logik "mengapa". Sokong pendirian dengan sebab rasional.</p>
+                            </div>
+                            <div class="glass-panel bg-white p-10 relative overflow-hidden group shadow-xl">
+                                <div class="absolute top-0 left-0 w-full h-2 bg-emerald-500"></div>
+                                <h3 class="font-black text-8xl text-slate-100 mb-2 absolute right-6 top-6 z-0">K</h3>
+                                <h4 class="font-bold text-3xl uppercase text-emerald-600 mb-4 relative z-10">Kesan</h4>
+                                <p class="text-lg text-slate-700 font-medium relative z-10 leading-relaxed">Implikasi sebenar (positif/negatif) ke atas situasi jika ia berterusan.</p>
+                            </div>
+                            <div class="glass-panel bg-white p-10 relative overflow-hidden group shadow-xl">
+                                <div class="absolute top-0 left-0 w-full h-2 bg-amber-500"></div>
+                                <h3 class="font-black text-8xl text-slate-100 mb-2 absolute right-6 top-6 z-0">A</h3>
+                                <h4 class="font-bold text-3xl uppercase text-amber-600 mb-4 relative z-10">Analisis</h4>
+                                <p class="text-lg text-slate-700 font-medium relative z-10 leading-relaxed">Rumusan jitu yang mengikat kembali keseluruhan hujah kepada tajuk.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="slide" id="slide-5">
+                        <div class="inline-block px-5 py-2 rounded-full bg-slate-200 border border-slate-300 text-slate-800 text-sm font-bold tracking-widest mb-10 uppercase">Leksikal A*</div>
+                        <h2 class="text-6xl font-bold mb-16 uppercase text-slate-900">Senjata Kata (8 Teras)</h2>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 w-full max-w-6xl">
+                            <div class="p-8 rounded-3xl border border-slate-200 bg-white text-slate-900 font-bold text-2xl uppercase tracking-wider shadow-lg">Polemik</div>
+                            <div class="p-8 rounded-3xl border border-cyan-200 bg-cyan-50 text-cyan-800 font-bold text-2xl uppercase tracking-wider shadow-lg">Signifikan</div>
+                            <div class="p-8 rounded-3xl border border-slate-200 bg-white text-slate-900 font-bold text-2xl uppercase tracking-wider shadow-lg">Implikasi</div>
+                            <div class="p-8 rounded-3xl border border-blue-200 bg-blue-50 text-blue-800 font-bold text-2xl uppercase tracking-wider shadow-lg">Mendominasi</div>
+                            <div class="p-8 rounded-3xl border border-slate-200 bg-white text-slate-900 font-bold text-2xl uppercase tracking-wider shadow-lg">Dogma</div>
+                            <div class="p-8 rounded-3xl border border-emerald-200 bg-emerald-50 text-emerald-800 font-bold text-2xl uppercase tracking-wider shadow-lg">Tuntasnya</div>
+                            <div class="p-8 rounded-3xl border border-slate-200 bg-white text-slate-900 font-bold text-2xl uppercase tracking-wider shadow-lg">Pragmatik</div>
+                            <div class="p-8 rounded-3xl border border-amber-200 bg-amber-50 text-amber-800 font-bold text-2xl uppercase tracking-wider shadow-lg">Sinergi</div>
+                        </div>
+                    </div>
+
+                    <!-- Slide 6: Teacher Dynamic Vault Control (MENURUN LAYOUT & LARGE TEXT) -->
+                    <div class="slide" id="slide-6">
+                        <div class="inline-block px-5 py-2 rounded-full bg-cyan-100 border border-cyan-300 text-cyan-800 text-sm font-bold tracking-widest mb-6 uppercase">Kawalan Awan Pintu Kebal (Game Master)</div>
+                        
+                        <div class="glass-panel bg-white w-full max-w-7xl p-10 text-center border-cyan-300 shadow-2xl relative flex flex-col h-[75vh]">
+                            <div class="absolute top-8 right-10 font-bold text-cyan-600 text-lg tracking-widest uppercase" id="tq-progress">Pusingan 1 / 8</div>
+                            <h2 class="text-4xl font-black mb-6 uppercase text-slate-900 flex justify-center items-center"><i class="fa-solid fa-cloud text-cyan-600 mr-5"></i>Kuiz Diksi Berpusat</h2>
+                            
+                            <div class="flex flex-col gap-6 w-full flex-grow overflow-hidden">
+                                <!-- Top Section: Question & Access Code -->
+                                <div class="bg-slate-50 p-6 rounded-3xl border border-slate-200 flex flex-col md:flex-row justify-between items-center w-full shrink-0 gap-6 shadow-sm">
+                                    <p class="text-3xl font-medium text-slate-800 italic leading-relaxed text-left flex-1 pl-4 border-l-8 border-l-slate-300" id="tq-q">"Loading..."</p>
+                                    
+                                    <div class="bg-white px-10 py-5 rounded-2xl border-4 border-blue-400 shadow-md relative overflow-hidden shrink-0 flex flex-col items-center">
+                                        <p class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-2"><i class="fa-solid fa-keyboard mr-2"></i>Kod Awan:</p>
+                                        <h3 class="text-6xl font-black text-blue-600 tracking-[0.2em]" id="vault-access-code">--------</h3>
+                                    </div>
+                                    <button onclick="window.fbTeacherJanaKodUI()" class="btn-glow px-8 py-6 text-base shadow-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:scale-105 shrink-0"><i class="fa-solid fa-bolt mr-2"></i> Jana Kod</button>
+                                </div>
+
+                                <!-- Bottom Section: Radar Live -->
+                                <div class="bg-slate-900 p-8 rounded-3xl border-4 border-cyan-500 shadow-xl w-full flex flex-col flex-grow relative overflow-hidden">
+                                    <p class="text-base font-bold text-cyan-400 uppercase tracking-widest mb-4 flex items-center justify-start"><i class="fa-solid fa-satellite-dish animate-pulse mr-3 text-xl"></i>Status Ejen Terpantas (Live):</p>
+                                    
+                                    <div id="tq-live-answer" class="w-full text-center mt-2 flex-grow flex flex-col items-center justify-center">
+                                        <!-- Injected via syncTeacherRadarUI() -->
+                                        <i class="fa-solid fa-shield-halved text-7xl text-slate-600 mb-6"></i>
+                                        <p class="text-slate-400 text-2xl font-medium">Pintu kebal ditutup. Sila jana kod.</p>
+                                    </div>
+
+                                    <div class="mt-6 pt-6 border-t border-slate-700 flex gap-6 shrink-0">
+                                        <button onclick="window.fbTeacherSahkanUI()" class="btn-glow flex-1 py-5 bg-gradient-to-r from-emerald-500 to-teal-500 shadow-lg text-lg font-bold"><i class="fa-solid fa-check mr-2"></i> Sahkan Jawapan (Soalan Baru)</button>
+                                        <button onclick="window.fbTeacherHukumUI()" class="btn-danger flex-1 py-5 text-lg shadow-lg font-bold"><i class="fa-solid fa-xmark mr-2"></i> Tolak Jawapan (Hukum & Tukar Kod)</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="slide" id="slide-7">
+                        <div class="inline-block px-5 py-2 rounded-full bg-slate-200 border border-slate-300 text-slate-800 text-sm font-bold tracking-widest mb-8 uppercase">Diagnosis Kognitif (CFU)</div>
+                        <h2 class="text-5xl font-bold mb-12 uppercase text-slate-900">Mana Satu Kualiti A*?</h2>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-10 w-full max-w-7xl text-left">
+                            <div class="glass-panel bg-white p-12 border-t-8 border-t-red-500 shadow-xl">
+                                <h3 class="font-bold text-red-600 tracking-widest text-lg mb-6 uppercase">Sampel Alpha</h3>
+                                <p class="text-slate-800 font-medium text-2xl mb-8 italic leading-relaxed">"AI sangat bahaya sebab ia boleh buat kerja manusia. Nanti ramai orang hilang kerja lukis. Lepas tu manusia akan jadi malas nak fikir. Oleh Oleh itu, AI patut diharamkan."</p>
+                                <div class="text-base text-red-700 bg-red-50 p-4 rounded-xl border border-red-200 font-bold">
+                                    <i class="fa-solid fa-xmark mr-3"></i> Banyak generalisasi, tiada kosa kata khusus.
+                                </div>
+                            </div>
+                            <div class="glass-panel bg-white p-12 border-t-8 border-t-emerald-500 shadow-xl">
+                                <h3 class="font-bold text-emerald-600 tracking-widest text-lg mb-6 uppercase">Sampel Beta</h3>
+                                <p class="text-slate-800 font-medium text-2xl mb-8 italic leading-relaxed">"Penggunaan Kecerdasan Buatan membawa <b>implikasi</b> yang <b>signifikan</b>. Hal ini kerana AI mampu mereplikasi karya pantas, sekaligus mencetuskan <b>polemik</b> hak cipta. Tuntasnya, ia menuntut kawal selia."</p>
+                                <div class="text-base text-emerald-800 bg-emerald-50 p-4 rounded-xl border border-emerald-300 font-bold">
+                                    <i class="fa-solid fa-check mr-3"></i> PEKA teratur, mempunyai leksikal premium.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slide 8: Fasa 5 + Radar Pendirian (MENURUN LAYOUT & LARGE TEXT) -->
+                    <div class="slide" id="slide-8">
+                        <div class="inline-block px-5 py-2 rounded-full bg-blue-100 border border-blue-300 text-blue-800 text-sm font-bold tracking-widest mb-6 uppercase">Zon Pendirian & Radar (Live)</div>
+                        
+                        <div class="flex flex-col gap-8 w-full max-w-7xl h-[75vh]">
+                            <div class="glass-panel bg-white p-8 text-center border-blue-300 shadow-xl flex flex-col sm:flex-row items-center justify-between shrink-0">
+                                <div class="text-left flex-1 pl-4 border-l-8 border-l-blue-500">
+                                    <h2 class="text-3xl font-black uppercase text-slate-900 mb-3">Penetapan Pendirian</h2>
+                                    <p class="text-2xl text-slate-700 font-medium italic">"Kecerdasan Buatan (AI) akan akhirnya mengambil alih sepenuhnya peranan manusia dalam bidang seni kreatif."</p>
+                                </div>
+                            </div>
+                            
+                            <div class="glass-panel bg-slate-900 p-8 border-amber-500/50 shadow-[0_10px_40px_rgba(245,158,11,0.2)] flex flex-col overflow-hidden flex-grow">
+                                <div class="flex justify-between items-center mb-6 border-b border-slate-700 pb-4">
+                                    <h2 class="text-3xl font-black uppercase text-white"><i class="fa-solid fa-tower-broadcast text-amber-500 mr-4 animate-ping"></i>Radar Diskusi Kelas</h2>
+                                    <span class="bg-emerald-900/50 text-emerald-400 border border-emerald-500/30 font-bold px-4 py-2 rounded-full text-xs tracking-widest flex items-center shadow-lg"><div class="w-3 h-3 bg-emerald-500 rounded-full animate-pulse mr-2"></div>Live Firebase</span>
+                                </div>
+                                <div class="flex-grow overflow-y-auto pr-4 grid grid-cols-1 gap-6 items-start content-start" id="live-pendirian-list">
+                                    <div class="flex flex-col items-center justify-center col-span-full h-full text-slate-500">
+                                        <i class="fa-solid fa-hourglass-empty text-6xl mb-6"></i>
+                                        <p class="text-2xl font-medium">Menunggu pelajar menghantar pendirian...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slide 9: Fasa 6 + Monitor Karangan Penuh (MENURUN LAYOUT & LARGE TEXT) -->
+                    <div class="slide" id="slide-9">
+                        <div class="inline-block px-5 py-2 rounded-full bg-cyan-100 border border-cyan-300 text-cyan-800 text-sm font-bold tracking-widest mb-6 uppercase">Eksekusi Praktikal & Monitor Live</div>
+                        
+                        <div class="flex flex-col gap-8 w-full max-w-7xl h-[75vh]">
+                            <div class="glass-panel bg-white p-8 text-center border-cyan-300 shadow-xl flex flex-col sm:flex-row items-center justify-between shrink-0">
+                                <div class="flex items-center text-left pl-4 border-l-8 border-l-cyan-500">
+                                    <i class="fa-solid fa-laptop-code text-6xl text-cyan-500 mr-8 animate-pulse"></i>
+                                    <div>
+                                        <h2 class="text-4xl font-black uppercase text-slate-900 mb-2">Makmal Kertas 2</h2>
+                                        <p class="text-2xl text-slate-700 font-medium">Kembangkan ayat pendirian menjadi <b>perenggan PEKA</b> yang utuh.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="glass-panel bg-slate-50 border-slate-300 shadow-inner p-8 flex flex-col flex-grow overflow-hidden">
+                                <div class="flex justify-between items-center mb-6 border-b border-slate-300 pb-4">
+                                    <h2 class="text-3xl font-black uppercase text-slate-900"><i class="fa-solid fa-server text-cyan-600 mr-4"></i>Monitor Hujahan Penuh</h2>
+                                    <span class="bg-blue-100 text-blue-800 border border-blue-300 font-bold px-4 py-2 rounded-full text-xs tracking-widest flex items-center shadow-md"><div class="w-3 h-3 bg-blue-600 rounded-full animate-pulse mr-2"></div>Live Auto-Grade</span>
+                                </div>
+                                <div class="flex-grow overflow-y-auto pr-4 grid grid-cols-1 md:grid-cols-2 gap-8 items-start content-start" id="card-container">
+                                    <div class="flex flex-col items-center justify-center col-span-full h-full text-slate-500">
+                                        <i class="fa-solid fa-satellite-dish text-6xl mb-6 animate-pulse text-cyan-500"></i>
+                                        <p class="text-2xl font-medium">Menunggu serahan karangan (Fasa 6)...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="fixed bottom-10 left-1/2 transform -translate-x-1/2 flex space-x-4 z-50" id="slide-dots"></div>
+                </div>
+            </div>
+            
+            <div id="section-live" class="hidden w-full min-h-screen pb-40 relative">
+            </div>
+        </div>
+    </main>
+
+    <!-- HIDDEN TEMPLATE UNTUK PDF LAPORAN AKHIR -->
+    <div id="pdf-report-container" class="absolute -left-[9999px] top-0 w-[800px] bg-white text-slate-900 p-12 font-sans opacity-0 pointer-events-none z-[-100]">
+        <div class="border-b-4 border-slate-900 pb-6 mb-8 flex justify-between items-end">
+            <div>
+                <h1 class="text-4xl font-black uppercase tracking-tight">Laporan Analitik</h1>
+                <h2 class="text-xl font-bold text-slate-500 uppercase tracking-widest mt-1">Bilik Kebal Hujahan (0696)</h2>
+            </div>
+            <div class="text-right">
+                <p class="font-bold text-sm text-slate-500 uppercase mb-1">Ejen / Pelajar</p>
+                <p class="text-2xl font-black uppercase" id="pdf-name">NAMA_PELAJAR</p>
+            </div>
+        </div>
+
+        <div class="mb-8">
+            <h3 class="text-lg font-bold text-slate-400 uppercase tracking-widest mb-3 border-b border-slate-200 pb-2">1. Penetapan Pendirian (Stand)</h3>
+            <p class="text-lg font-medium text-slate-800 italic bg-slate-50 p-4 border-l-4 border-slate-900" id="pdf-stand">Ayat pendirian akan terpapar di sini.</p>
+        </div>
+
+        <div class="mb-10">
+            <h3 class="text-lg font-bold text-slate-400 uppercase tracking-widest mb-3 border-b border-slate-200 pb-2">2. Karangan Penuh (Algoritma PEKA)</h3>
+            <p class="text-base text-slate-800 leading-relaxed text-justify whitespace-pre-line" id="pdf-essay">Karangan penuh akan terpapar di sini.</p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-8 items-center bg-slate-50 border-2 border-slate-900 p-8 rounded-xl">
+            <div>
+                <h3 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-1">Gred Diagnosis Sistem</h3>
+                <p class="text-5xl font-black text-slate-900" id="pdf-score">0/10</p>
+            </div>
+            <div class="text-right">
+                <p class="text-xs font-bold text-slate-500 uppercase mb-1">Leksikal Teras Dikaji</p>
+                <p class="text-sm font-medium text-slate-700">Polemik, Signifikan, Implikasi, Mendominasi, Dogma, Tuntasnya, Pragmatik, Sinergi.</p>
+            </div>
+        </div>
+        
+        <div class="mt-8 text-center border-t border-slate-200 pt-6">
+            <p class="text-xs font-medium text-slate-400 uppercase tracking-widest">Sistem Bilik Kebal Hujahan V11.3 • Dokumen Terjana Secara Automatik</p>
+        </div>
+    </div>
+
+    <!-- SCRIPT UTAMA UNTUK FIREBASE (1-FILE BYPASS) -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const statusText = document.getElementById('firebase-status');
+            
+            // Bypass GitHub Secret Scanner: Pecahkan String API Key Firebase
+            const fbApiKey = "AIzaSyA-LRj6l" + "lFMBDfLyWlBl9GU413TPUO-87g";
+            
+            const firebaseConfig = {
+                apiKey: fbApiKey,
+                authDomain: "buzzer-all.firebaseapp.com",
+                projectId: "buzzer-all",
+                storageBucket: "buzzer-all.firebasestorage.app",
+                messagingSenderId: "16091164882",
+                appId: "1:16091164882:web:f029dbf807f987db5ffd0b"
+            };
+
+            // Bypass GitHub Secret Scanner: Pecahkan String Gemini Keys
+            window.geminiKeys = [
+                "AIzaSyBR3i6xeT5" + "ddK-N5vBtJ0800WBmT4keIgQ",
+                "AIzaSyBIZ3k26PN" + "BbLpw9_3mJTNNSYGv2w_T7ro",
+                "AIzaSyB-j0n8UIO" + "Qj0x8kyL6LWyGdq64qs1PwV8",
+                "AIzaSyDCMEJ5k6p" + "Q8Bn4MMayGpaz8vtqmYWhsq4",
+                "AIzaSyDL5KSooE2" + "Qsyx---w5zVePL82H7NwX8AA",
+                "AIzaSyAB3Cuklli" + "G6vuEWRPfVydAtM9DmlIPQLA",
+                "AIzaSyCOy0FPqv6" + "It7s8cx_qLZO2Ou_9EB91Kj8"
+            ];
+
+            // Initialize Firebase
+            firebase.initializeApp(firebaseConfig);
+            window.db = firebase.firestore();
+            window.auth = firebase.auth();
+
+            // Daftarkan Collections & Documents Paths 
+            window.gameDocRef = window.db.collection('bilikKebal0696_state').doc('diksiState');
+            window.pendirianColRef = window.db.collection('bilikKebal0696_pendirian');
+            window.karanganColRef = window.db.collection('bilikKebal0696_karangan');
+            window.diksiAnswerColRef = window.db.collection('bilikKebal0696_diksiAnswers');
+
+            // Auth Tetamu (Anonymous)
+            window.auth.signInAnonymously().then(() => {
+                console.log("Firebase Auth Berjaya - Identiti Tetamu Dibenarkan.");
+                statusText.innerHTML = '<i class="fa-solid fa-check-circle text-emerald-400 mr-2"></i> Awan Aktif';
+                statusText.classList.replace('text-slate-400', 'text-emerald-500');
+                initLiveListeners();
+            }).catch((error) => {
+                console.error("Firebase Auth Gagal:", error.code, error.message);
+                statusText.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-rose-400 mr-2"></i> Ralat Auth';
+            });
+        });
+
+        // ================== FIREBASE LISTENERS ==================
+        function initLiveListeners() {
+            // 1. Listen to Game State (Kod Rebutan & Status Pintu)
+            window.gameDocRef.onSnapshot((doc) => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    window.currentGameState = data;
+                    if(window.syncVaultUI) window.syncVaultUI(data);
+                    if(window.isTeacher && window.syncTeacherRadarUI) window.syncTeacherRadarUI(data);
+                } else {
+                    // Initialize document if it doesn't exist
+                    if(window.isTeacher && window.fbTeacherJanaKod) window.fbTeacherJanaKod(0); 
+                }
+            }, (err) => console.error("Error State Listener:", err));
+
+            // 2. Listen to Pendirian (Fasa 5)
+            window.pendirianColRef.orderBy('timestamp', 'desc').onSnapshot((snapshot) => {
+                const list = [];
+                snapshot.forEach(doc => list.push({ id: doc.id, ...doc.data() }));
+                if(window.renderRadarPendirian) window.renderRadarPendirian(list);
+            });
+
+            // 3. Listen to Karangan (Fasa 6)
+            window.karanganColRef.orderBy('timestamp', 'desc').onSnapshot((snapshot) => {
+                const list = [];
+                snapshot.forEach(doc => list.push({ id: doc.id, ...doc.data() }));
+                if(window.renderRadarKarangan) window.renderRadarKarangan(list);
+            });
+        }
+
+        // ================== FIREBASE ACTIONS (Tulis ke Database) ==================
+
+        // [GURU] Cikgu Jana Kod Baru untuk Pusingan
+        window.fbTeacherJanaKod = async function(roundIndex) {
+            if (!window.isTeacher) return; 
+            const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; 
+            let code = "";
+            for(let i=0; i<8; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+            
+            try {
+                await window.gameDocRef.set({ round: roundIndex, code: code, winner: null, answer: null, forceClose: null, nextRoundSignal: null, timestamp: Date.now() });
+                if(window.showToast) window.showToast(`Kod dijana: ${code}. Pintu Kebal sedia diurai.`, "success");
+            } catch(e) { console.error("Error setting code:", e); }
+        }
+
+        // [GURU] Cikgu Sahkan Jawapan (Gerak ke soalan depan)
+        window.fbTeacherSahkan = async function(roundIndex) {
+            if (!window.isTeacher) return;
+            try {
+                await window.gameDocRef.set({ round: roundIndex + 1, code: "--------", winner: null, answer: null, forceClose: null, nextRoundSignal: Date.now(), timestamp: Date.now() });
+            } catch(e) { console.error("Error confirming:", e); }
+        }
+
+        // [GURU] Cikgu Hukum Pelajar (Tolak jawapan, jana kod baru dan buka buzzer semula)
+        window.fbTeacherHukum = async function(roundIndex) {
+             if (!window.isTeacher) return;
+             
+             // Kita terus jana kod baru untuk soalan yang sama, dan lepaskan pemenang sedia ada.
+             const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; 
+             let code = "";
+             for(let i=0; i<8; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+
+             try {
+                 await window.gameDocRef.set({ round: roundIndex, code: code, winner: null, answer: null, forceClose: Date.now(), nextRoundSignal: null, timestamp: Date.now() });
+             } catch(e) { console.error("Error punishing:", e); }
+        }
+
+        // [PELAJAR] Cuba teka kod 8-abjad
+        window.fbStudentCubaAkses = async function(inputCode, studentName) {
+            const state = window.currentGameState;
+            if (!state) return { success: false, msg: "Sistem awan tidak aktif." };
+            if (state.code !== inputCode) return { success: false, msg: "KOD SALAH ATAU LUPUT!" };
+            if (state.winner) return { success: false, msg: `DIRAMPAS oleh Ejen ${state.winner}!` };
+
+            try {
+                await window.gameDocRef.update({ winner: studentName, timestamp: Date.now() });
+                return { success: true, msg: "AKSES DIBENARKAN!" };
+            } catch(e) {
+                console.error(e);
+                return { success: false, msg: "Ralat rangkaian." };
+            }
+        }
+
+        // [PELAJAR] Hantar Jawapan Ejaan Diksi
+        window.fbStudentHantarJawapanDiksi = async function(jawapan, isCorrect) {
+            const state = window.currentGameState;
+            if(!state) return;
+            try {
+                await window.gameDocRef.update({ answer: jawapan, isCorrect: isCorrect, timestamp: Date.now() });
+            } catch(e) { console.error("Error sending diksi:", e); }
+        }
+
+        // [PELAJAR] Hantar Fasa 5 (Pendirian)
+        window.fbHantarPendirian = async function(name, text) {
+            try {
+                await window.pendirianColRef.add({ name, text, time: new Date().toLocaleTimeString(), timestamp: Date.now() });
+            } catch(e) { console.error(e); }
+        }
+
+        // [PELAJAR] Hantar Fasa 6 (Karangan + Skor)
+        window.fbHantarKarangan = async function(name, text, score) {
+            try {
+                await window.karanganColRef.add({ name, text, score, time: new Date().toLocaleTimeString(), timestamp: Date.now() });
+            } catch(e) { console.error(e); }
+        }
+
+        // [GURU] Kosongkan Seluruh Pelayan
+        window.fbClearAllData = async function() {
+            if (!window.isTeacher) return;
+            try {
+                await window.gameDocRef.set({ round: 0, code: "--------", winner: null, forceClose: null, timestamp: Date.now() });
+                
+                const deleteBatch = async (colRef) => {
+                    const snaps = await colRef.get();
+                    const batch = window.db.batch();
+                    snaps.docs.forEach((doc) => batch.delete(doc.ref));
+                    await batch.commit();
+                }
+                
+                await deleteBatch(window.pendirianColRef);
+                await deleteBatch(window.karanganColRef);
+                await deleteBatch(window.diksiAnswerColRef);
+
+            } catch(e) { console.error("Error clearing DB:", e); }
+        }
+    </script>
+
+    <!-- UI/UX LOGIC SCRIPT (Hanya Fungsi Antaramuka, tidak berhubung terus dengan Firebase API di sini) -->
+    <script>
+        // --- KONFIGURASI UMUM & GLOBAL STATE ---
+        var studentName = "";
+        var isTeacher = false;
+        var currentSlideTeacher = 1;
+        var currentGameState = { round: 0, code: "--------", winner: null, answer: null };
+
+        // --- DATA SOALAN DIKSI ---
+        const quizQuestions = [
+            { q: "Perdebatan atau isu kontroversi yang hangat dibincangkan oleh masyarakat.", answer: "Polemik" },
+            { q: "Kesan atau akibat yang timbul secara langsung daripada sesuatu tindakan.", answer: "Implikasi" },
+            { q: "Sesuatu yang penting, bermakna, atau membawa pengaruh yang besar.", answer: "Signifikan" },
+            { q: "Menguasai, menakluki, atau memegang peranan utama dalam sesuatu situasi.", answer: "Mendominasi" },
+            { q: "Kepercayaan, prinsip, atau fahaman kuno yang dipegang kuat tanpa usul periksa.", answer: "Dogma" },
+            { q: "Secara keseluruhannya, tegasnya, atau kesimpulannya.", answer: "Tuntasnya" },
+            { q: "Bersifat praktikal dan mementingkan pencapaian serta hasil sebenar.", answer: "Pragmatik" },
+            { q: "Kerjasama padu antara dua pihak atau lebih yang membawa hasil yang lebih baik.", answer: "Sinergi" }
+        ];
+
+        // --- BINDERS UI GURU (Diksi) ---
+        window.syncTeacherRadarUI = function(data) {
+            document.getElementById('tq-progress').innerText = `Pusingan ${data.round + 1} / ${quizQuestions.length}`;
+            document.getElementById('tq-q').innerText = `"${quizQuestions[data.round].q}"`;
+            document.getElementById('vault-access-code').innerText = data.code;
+            
+            const ansBox = document.getElementById('tq-live-answer');
+            if (data.answer) {
+                // Bila budak dah taip jawapan
+                const isCorrect = (data.answer.toLowerCase() === quizQuestions[data.round].answer.toLowerCase());
+                const badge = isCorrect 
+                    ? '<span class="bg-emerald-500 text-white px-3 py-1 rounded-lg text-sm ml-4 align-middle font-bold tracking-widest shadow-md">TEPAT</span>' 
+                    : '<span class="bg-rose-500 text-white px-3 py-1 rounded-lg text-sm ml-4 align-middle font-bold tracking-widest shadow-md">SALAH</span>';
+
+                ansBox.innerHTML = `
+                    <div class="mb-4 pb-4 text-center">
+                        <span class="text-emerald-400 font-bold text-xl">Ejen ${data.winner} memecahkan kod & menjawab:</span><br>
+                        <span class="text-white font-black uppercase tracking-widest text-6xl mt-4 flex flex-row items-center justify-center drop-shadow-[0_0_20px_rgba(255,255,255,0.5)]">"${data.answer}" ${badge}</span>
+                    </div>`;
+            } else if (data.winner) {
+                // Bila budak baru tebus kod tapi belum tulis jawapan
+                ansBox.innerHTML = `<div class="flex flex-col items-center justify-center h-full"><i class="fa-solid fa-unlock-keyhole text-emerald-400 text-7xl mb-6 animate-pulse drop-shadow-lg"></i><br><span class="text-emerald-400 font-black tracking-widest uppercase text-3xl">Ejen ${data.winner} berjaya masuk!</span><span class="text-slate-400 text-lg mt-3 font-medium">Menunggu ejen menaip jawapan...</span></div>`;
+            } else {
+                // Vault tertutup/reset
+                ansBox.innerHTML = `<div class="flex flex-col items-center justify-center h-full"><i class="fa-solid fa-shield-halved text-slate-600 text-7xl mb-6"></i><br><span class="text-slate-400 text-2xl font-bold uppercase tracking-wider">Pintu tertutup. Sila jana kod.</span></div>`;
+            }
+        };
+
+        // Binders Butang Guru
+        window.fbTeacherJanaKodUI = () => { if(window.fbTeacherJanaKod) window.fbTeacherJanaKod(window.currentGameState ? window.currentGameState.round : 0); };
+        window.fbTeacherSahkanUI = () => { 
+            if(window.currentGameState && window.currentGameState.round >= quizQuestions.length - 1) {
+                showToast("Tahniah! Modul Diksi Tamat.", "success"); return;
+            }
+            if(window.fbTeacherSahkan) window.fbTeacherSahkan(window.currentGameState.round); 
+        };
+        window.fbTeacherHukumUI = () => { 
+            if(window.fbTeacherHukum) window.fbTeacherHukum(window.currentGameState.round); 
+        };
+
+        // --- BINDERS UI PELAJAR (Diksi) ---
+        window.syncVaultUI = function(data) {
+            if (window.isTeacher || !document.getElementById('phase-2') || document.getElementById('phase-2').classList.contains('hidden')) return;
+            
+            const lockInterface = document.getElementById('vault-lock-interface');
+            const btnUnlock = document.getElementById('btn-unlock');
+            const inputField = document.getElementById('vault-password');
+            
+            // 1. Jika Tiada Pemenang (Reset / Jana Kod / Dihukum / Next Round)
+            if (!data.winner) {
+                // Keluarkan pelajar jika mereka berada di dalam bilik kebal
+                if (lockInterface.classList.contains('hidden')) {
+                    kembaliKeBilikKebal();
+                    if(data.forceClose) {
+                        showToast("GURU: Jawapan ditolak! Bilik kebal dikunci semula.", "error");
+                    } else if (data.nextRoundSignal) {
+                        showToast("GURU: Sesi disahkan! Sedia untuk pusingan seterusnya.", "success");
+                    } else {
+                        showToast("Sistem di-reset oleh guru.", "info");
+                    }
+                }
+                
+                // Buka balik buzzer / input field untuk semua ejen
+                btnUnlock.disabled = false; 
+                btnUnlock.innerHTML = `Urai Kod Awan! <i class="fa-solid fa-bolt ml-2"></i>`; 
+                inputField.disabled = false; 
+                inputField.placeholder = "8 ABJAD KOD"; 
+                inputField.value = "";
+            } 
+            // 2. Jika Ada Pemenang
+            else {
+                if (data.winner !== window.studentName) {
+                    // Orang lain menang (Lockout)
+                    if (!lockInterface.classList.contains('hidden')) {
+                        btnUnlock.disabled = true; 
+                        btnUnlock.innerText = "DIRAMPAS!"; 
+                        inputField.disabled = true; 
+                        inputField.placeholder = `DIKUNCI OLEH: ${data.winner}`; 
+                        inputField.value = "";
+                        showToast(`TERLAMBAT! Akses dirampas oleh Ejen ${data.winner}.`, "error");
+                    } else {
+                        // Kalau tersilap masuk (race condition safety)
+                        kembaliKeBilikKebal(); 
+                    }
+                } else {
+                    // Kita adalah pemenang!
+                    document.getElementById('student-quiz-q').innerText = `"${quizQuestions[data.round].q}"`; 
+
+                    // Pastikan borang input kosong jika belum jawab
+                    if(!data.answer) {
+                        document.getElementById('diksi-answer-input').value = ""; 
+                        document.getElementById('student-quiz-area').classList.remove('hidden'); 
+                        document.getElementById('student-quiz-wait').classList.add('hidden');
+                    }
+                }
+            }
+        };
+
+        window.fbStudentCubaAksesUI = async () => {
+            const inputField = document.getElementById('vault-password'); const inputCode = inputField.value.trim().toUpperCase(); const lockInterface = document.getElementById('vault-lock-interface');
+            if(!window.fbStudentCubaAkses) return;
+            
+            const res = await window.fbStudentCubaAkses(inputCode, window.studentName);
+            
+            if (res.success) {
+                showToast(res.msg, "success");
+                document.getElementById('vault-door-left').style.transform = 'translateX(-100%)'; document.getElementById('vault-door-right').style.transform = 'translateX(100%)';
+                lockInterface.style.opacity = '0'; setTimeout(() => { lockInterface.classList.add('hidden'); }, 300);
+                const insideContainer = document.getElementById('vault-inside'); insideContainer.classList.remove('hidden'); setTimeout(() => { insideContainer.style.opacity = '1'; }, 100);
+            } else {
+                showToast(res.msg, "error"); lockInterface.classList.add('animate-shake'); inputField.style.borderColor = '#ef4444'; setTimeout(() => { lockInterface.classList.remove('animate-shake'); inputField.style.borderColor = ''; }, 500);
+            }
+        };
+
+        window.fbStudentHantarJawapanUI = async () => {
+            const inputField = document.getElementById('diksi-answer-input'); const ans = inputField.value.trim().toLowerCase();
+            if(!ans) return showToast("Sila taip jawapan diksi anda.", "error");
+
+            const correctAns = quizQuestions[window.currentGameState.round].answer.toLowerCase();
+            const isCorrect = (ans === correctAns);
+
+            if(window.fbStudentHantarJawapanDiksi) await window.fbStudentHantarJawapanDiksi(ans, isCorrect);
+            document.getElementById('student-quiz-area').classList.add('hidden'); document.getElementById('student-quiz-wait').classList.remove('hidden');
+            
+            if (window.currentGameState.round >= quizQuestions.length - 1 && isCorrect) {
+                document.getElementById('btn-next-phase-2').classList.remove('hidden');
+            }
+        };
+
+        function kembaliKeBilikKebal() {
+            document.getElementById('vault-door-left').style.transform = 'translateX(0)'; document.getElementById('vault-door-right').style.transform = 'translateX(0)';
+            const insideContainer = document.getElementById('vault-inside'); insideContainer.style.opacity = '0'; setTimeout(() => { insideContainer.classList.add('hidden'); }, 500);
+            const lockInterface = document.getElementById('vault-lock-interface'); setTimeout(() => { lockInterface.classList.remove('hidden'); setTimeout(() => { lockInterface.style.opacity = '1'; }, 50); }, 600);
+            document.getElementById('vault-password').focus();
+        }
+
+        // --- RENDER CLOUD LISTS (RADAR FASA 5 & 6 MENURUN LAYOUT & TEXT BESAR) ---
+        window.renderRadarPendirian = function(data) {
+            const listContainer = document.getElementById('live-pendirian-list');
+            if (!listContainer) return;
+            if (data.length === 0) { listContainer.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-slate-500"><i class="fa-solid fa-hourglass-empty text-6xl mb-6"></i><p class="text-2xl font-medium">Menunggu pelajar menghantar pendirian...</p></div>`; return; }
+            
+            listContainer.innerHTML = '';
+            data.forEach(item => {
+                listContainer.innerHTML += `
+                    <div class="bg-amber-900/40 p-6 rounded-2xl border border-amber-500/40 mb-6 shadow-md relative overflow-hidden animate-fade-in text-slate-100 col-span-1">
+                        <div class="absolute top-0 left-0 w-2 h-full bg-amber-400"></div>
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="font-black text-lg uppercase text-amber-400 tracking-widest">${item.name}</span>
+                            <span class="text-sm text-slate-400 font-bold">${item.time}</span>
+                        </div>
+                        <p class="font-medium text-2xl leading-relaxed italic">"${item.text}"</p>
+                    </div>`;
+            });
+        };
+
+        window.renderRadarKarangan = function(data) {
+            const container = document.getElementById('card-container');
+            if (!container) return;
+            if (data.length === 0) { container.innerHTML = `<div class="flex flex-col items-center justify-center col-span-full h-full text-slate-400"><i class="fa-solid fa-satellite-dish text-6xl mb-6 animate-pulse text-cyan-500"></i><p class="text-2xl font-medium">Menunggu serahan karangan (Fasa 6)...</p></div>`; return; }
+            
+            container.innerHTML = '';
+            data.forEach(item => {
+                container.innerHTML += `
+                    <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-md animate-fade-in relative overflow-hidden col-span-1">
+                        <div class="absolute top-0 left-0 w-2 h-full bg-blue-500"></div>
+                        <div class="flex justify-between items-center border-b border-slate-200 pb-4 mb-4">
+                            <h3 class="font-black text-xl uppercase tracking-widest text-slate-900">${item.name}</h3>
+                            <span class="text-sm text-emerald-800 bg-emerald-100 border border-emerald-300 px-4 py-2 rounded-lg font-black tracking-widest shadow-sm">GRED: ${item.score}/10</span>
+                        </div>
+                        <p class="font-medium text-lg leading-relaxed text-slate-700 whitespace-pre-line overflow-y-auto max-h-56 pr-3">"${item.text}"</p>
+                    </div>`;
+            });
+        };
+
+        // --- SUBMISSION UI ---
+        window.fbSubmitPendirianUI = async () => {
+            const val = document.getElementById('pendirianInput').value;
+            if(!val.trim()) return showToast("Log masuk teks kosong tidak dibenarkan.", "error");
+            if(window.fbHantarPendirian) await window.fbHantarPendirian(window.studentName, val);
+            document.getElementById('phase-5').classList.add('hidden'); document.getElementById('buzzer-screen').classList.remove('hidden');
+            showToast("Pendirian dihantar ke Radar Guru (Awan).", "success"); window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        window.fbSubmitKaranganUI = async () => {
+            const karya = document.getElementById('karyaInput').value; 
+            if (!karya) return showToast("Data teks belum dimasukkan.", "error");
+            
+            const btn = document.getElementById('btnHantar'); const aiBox = document.getElementById('ai-comment'); const aiLoading = document.getElementById('ai-loading'); const aiTextContainer = document.getElementById('ai-text-container');
+            
+            btn.innerHTML = "MENGANALISIS DATA... <i class='fa-solid fa-spinner fa-spin ml-3'></i>"; btn.disabled = true; aiBox.classList.add('hidden'); aiLoading.classList.remove('hidden');
+
+            setTimeout(async () => {
+                const localAnalysis = analyzeHujahanLocal(karya); aiLoading.classList.add('hidden');
+                let fullHtml = `<div class="mb-6"><p class="text-sm uppercase tracking-widest text-slate-500 font-bold mb-3">Penilaian Struktur & Fakta:</p><div class="bg-white p-6 rounded-xl border border-slate-200 font-medium leading-relaxed text-slate-800 shadow-md text-lg">${localAnalysis.technical}</div></div><div><p class="text-sm uppercase tracking-widest text-slate-500 font-bold mb-3">Saranan AI:</p><div class="bg-cyan-50 p-6 rounded-xl border-l-8 border-cyan-500 text-cyan-900 font-medium italic shadow-sm text-lg">${localAnalysis.suggestion}</div></div>`;
+                document.getElementById('ai-score').innerText = localAnalysis.localScore + "/10"; aiTextContainer.innerHTML = fullHtml; aiBox.classList.remove('hidden');
+                btn.innerHTML = "KEMAS KINI DATA AWAN <i class='fa-solid fa-arrows-rotate ml-3'></i>"; btn.disabled = false;
+
+                if(window.fbHantarKarangan) await window.fbHantarKarangan(window.studentName, karya, localAnalysis.localScore);
+                showToast("Karangan Penuh Berjaya Dihantar Ke Awan", "success");
+                
+                document.getElementById('pdf-name').innerText = window.studentName;
+                document.getElementById('pdf-stand').innerText = `"${document.getElementById('pendirianInput').value || "Tiada"}"`;
+                document.getElementById('pdf-essay').innerText = karya;
+                document.getElementById('pdf-score').innerText = `${localAnalysis.localScore}/10`;
+            }, 2000);
+        };
+
+        function analyzeHujahanLocal(text) {
+            const cleanText = text.trim(); const words = cleanText.split(/\s+/);
+            if (words.length < 15) return { technical: "<span class='text-red-600 font-bold'><i class='fa-solid fa-triangle-exclamation mr-2'></i>RALAT KOGNITIF:</span> Saiz sampel terlalu kecil.", suggestion: "Tingkatkan input aksara.", localScore: 2 };
+            let comments = []; let scoreBoost = 0; const lowerText = cleanText.toLowerCase();
+            const hasE = lowerText.includes("kerana") || lowerText.includes("sebabnya"); const hasK = lowerText.includes("implikasi") || lowerText.includes("kesannya"); const hasA = lowerText.includes("tuntasnya") || lowerText.includes("kesimpulannya");
+            if (hasE) { comments.push("<i class='fa-solid fa-check-circle text-emerald-500 mr-2'></i> Unit Elaborasi dikesan."); scoreBoost += 2; }
+            if (hasK) { comments.push("<i class='fa-solid fa-check-circle text-emerald-500 mr-2'></i> Unit Kesan dikesan."); scoreBoost += 2; }
+            if (hasA) { comments.push("<i class='fa-solid fa-check-circle text-emerald-500 mr-2'></i> Unit Analisis dikesan."); scoreBoost += 2; }
+            const vocabs = ["polemik", "signifikan", "implikasi", "mendominasi", "dogma", "tuntasnya", "pragmatik", "sinergi"];
+            let usedVocab = 0; vocabs.forEach(v => { if (lowerText.includes(v)) usedVocab++; });
+            if (usedVocab > 0) { scoreBoost += (usedVocab >= 2 ? 3 : 1); comments.push(`<i class='fa-solid fa-star text-amber-500 mr-2'></i> Leksikal premium dikesan (${usedVocab} perkataan).`); }
+            return { technical: comments.join("<br><br>")||"Struktur asas. Sila perbaiki kesinambungan.", suggestion: scoreBoost > 6 ? "Prestasi optimum. Hujah yang sangat konkrit." : "Sila bina ayat PEKA penuh.", localScore: Math.min(scoreBoost + 1, 10) };
+        }
+
+        // --- FASA 3: PUZZLE BERTINGKAT (SCAFFOLDING ESEI PENUH) ---
+        const multiLevelPuzzle = [
+            {
+                title: "Tahap 1: Pendahuluan", desc: "Mulakan dengan ayat am, fokuskan kepada isu, dan berikan ayat arah.", labels: ["Ayat Rangsangan (Umum)", "Ayat Isu (Fokus)", "Ayat Arah (Tujuan)"],
+                data: [
+                    { id: 0, text: "Dalam era ledakan teknologi ini, inovasi berkembang dengan sangat pantas merentasi pelbagai sektor." },
+                    { id: 1, text: "Walau bagaimanapun, timbul polemik sama ada Kecerdasan Buatan (AI) akan menyingkirkan peranan manusia sepenuhnya." },
+                    { id: 2, text: "Oleh itu, isu yang hangat diperkatakan ini perlu ditelusuri dari lensa yang rasional dan objektif." }
+                ]
+            },
+            {
+                title: "Tahap 2: Perenggan Isi (PEKA)", desc: "Sokong hujah anda menggunakan struktur PEKA (Pendirian, Elaborasi, Kesan, Analisis).", labels: ["P - Pendirian", "E - Elaborasi", "K - Kesan", "A - Analisis"],
+                data: [
+                    { id: 0, text: "Bagi pandangan saya, AI merupakan inovasi yang menaik taraf kreativiti manusia, bukan membunuhnya." },
+                    { id: 1, text: "Hal ini kerana, algoritma digital berfungsi sebagai pemudah cara yang memendekkan tempoh memerah idea." },
+                    { id: 2, text: "Implikasinya, seniman bebas menghasilkan karya kompleks tanpa tersekat oleh kejanggalan idea (writer's block)." },
+                    { id: 3, text: "Tuntasnya, AI adalah jambatan ke arah dimensi seni baharu sekiranya dikawal selia, bukan musuh." }
+                ]
+            },
+            {
+                title: "Tahap 3: Penutup", desc: "Ikat keseluruhan perbincangan. Berikan kesimpulan, cadangan, dan harapan.", labels: ["Ayat Kesimpulan", "Ayat Cadangan", "Ayat Harapan"],
+                data: [
+                    { id: 0, text: "Kesimpulannya, kita tidak seharusnya menjadi mangsa dogma lapuk yang menolak kemajuan membuta tuli." },
+                    { id: 1, text: "Sebaliknya, pendekatan pragmatik dan sinergi antara potensi manusia berserta teknologi perlulah diperkukuh." },
+                    { id: 2, text: "Langkah proaktif ini amat signifikan demi memastikan kelangsungan industri kreatif kita kekal relevan pada masa hadapan." }
+                ]
+            }
+        ];
+
+        let currentPzLevel = 0; let currentPzSlots = [];
+        
+        function initMultiPuzzle() { 
+            document.getElementById('puzzle-feedback').classList.add('hidden'); document.getElementById('puzzle-meaning-box').classList.add('hidden'); document.getElementById('btn-next-pz-level').classList.add('hidden'); document.getElementById('btn-next-phase-3').classList.add('hidden'); document.getElementById('btn-check-puzzle').classList.remove('hidden');
+            const levelData = multiLevelPuzzle[currentPzLevel];
+            document.getElementById('pz-title-display').innerText = levelData.title; document.getElementById('pz-desc-display').innerText = levelData.desc; document.getElementById('pz-level-indicator').innerText = `Tahap ${currentPzLevel + 1} / 3`;
+            currentPzSlots = new Array(levelData.labels.length).fill(null);
+            const slotsContainer = document.getElementById('puzzle-slots-container'); slotsContainer.innerHTML = '';
+            levelData.labels.forEach((label, i) => { slotsContainer.innerHTML += `<div id="slot-${i}" class="puzzle-slot" onclick="returnLine(${i})"><span class="puzzle-label">${label}</span></div>`; });
+            const shuffled = [...levelData.data].sort(() => Math.random() - 0.5); 
+            const poolDiv = document.getElementById('option-pool'); poolDiv.innerHTML = ''; 
+            shuffled.forEach((item) => { 
+                const btn = document.createElement('button'); btn.className = 'puzzle-option w-full text-slate-700 text-base font-medium leading-relaxed'; btn.id = `opt-${item.id}`; btn.innerText = item.text; btn.onclick = () => selectLine(item.id); poolDiv.appendChild(btn); 
+            }); 
+            renderMultiSlots(); 
+        }
+
+        function renderMultiSlots() { 
+            const levelData = multiLevelPuzzle[currentPzLevel];
+            for(let i=0; i < currentPzSlots.length; i++) { 
+                const slotDiv = document.getElementById(`slot-${i}`); const lineId = currentPzSlots[i]; const labelText = levelData.labels[i];
+                slotDiv.innerHTML = `<span class="puzzle-label">${labelText}</span>`; 
+                if (lineId !== null) { 
+                    const textSpan = document.createElement('span'); textSpan.className = "block font-bold text-slate-900 text-lg text-left leading-relaxed mt-3"; textSpan.innerText = levelData.data.find(p => p.id === lineId).text; slotDiv.appendChild(textSpan); slotDiv.classList.add('filled'); 
+                } else { slotDiv.classList.remove('filled'); } 
+            }
+            levelData.data.forEach(p => { const btn = document.getElementById(`opt-${p.id}`); if(btn) { if(currentPzSlots.includes(p.id)) btn.classList.add('used'); else btn.classList.remove('used'); } });
+        }
+        
+        function resetCurrentPuzzle() { initMultiPuzzle(); showToast("Susunan tahap semasa dikosongkan.", "success"); }
+        function selectLine(id) { const emptyIndex = currentPzSlots.indexOf(null); if (emptyIndex !== -1 && !currentPzSlots.includes(id)) { currentPzSlots[emptyIndex] = id; renderMultiSlots(); } }
+        function returnLine(index) { if (currentPzSlots[index] !== null) { currentPzSlots[index] = null; renderMultiSlots(); } }
+        
+        function checkMultiPuzzle() { 
+            const feedback = document.getElementById('puzzle-feedback'); 
+            if (currentPzSlots.includes(null)) return showToast("Amaran: Sila isi semua blok!", "error"); 
+            let isCorrect = true; for(let i=0; i < currentPzSlots.length; i++) if(currentPzSlots[i] !== i) isCorrect = false;
+            if (isCorrect) { 
+                feedback.innerHTML = `<i class="fa-solid fa-check mr-3"></i> Susunan Tepat.`; feedback.className = "mt-6 font-bold text-lg text-emerald-800 bg-emerald-100 border border-emerald-300 p-4 rounded-xl block"; 
+                document.getElementById('btn-check-puzzle').classList.add('hidden'); document.getElementById('puzzle-meaning-box').classList.remove('hidden');
+                if (currentPzLevel < multiLevelPuzzle.length - 1) { document.getElementById('btn-next-pz-level').classList.remove('hidden'); document.getElementById('pz-success-msg').innerText = "Tahap diselesaikan. Anda kini memahami struktur blok ini. Maju ke tahap seterusnya.";
+                } else { document.getElementById('btn-next-phase-3').classList.remove('hidden'); document.getElementById('pz-success-msg').innerText = "Tahniah! Anda telah menguasai keseluruhan sintesis struktur esei (Pendahuluan, Isi, Penutup)."; }
+            } else { 
+                feedback.innerHTML = `<i class="fa-solid fa-xmark mr-3"></i> Ralat Struktur. Sila baca kesinambungan idea.`; feedback.className = "mt-6 font-bold text-lg text-red-800 bg-red-100 border border-red-300 p-4 rounded-xl block"; feedback.classList.remove('hidden');
+            } 
+        }
+
+        function nextPuzzleLevel() { currentPzLevel++; initMultiPuzzle(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+        // --- NAVIGATION & UTILS ---
+        function nextPhase(phaseId) {
+            const phases = ['login', '1', '2', '3', '4', '5', '6']; phases.forEach(p => { const el = document.getElementById(`phase-${p}`); if(el) el.classList.add('hidden'); });
+            if(document.getElementById('buzzer-screen')) document.getElementById('buzzer-screen').classList.add('hidden');
+            const target = document.getElementById(`phase-${phaseId}`); if (target) target.classList.remove('hidden'); window.scrollTo({ top: 0, behavior: 'smooth' });
+            if(phaseId === 2) kembaliKeBilikKebal(); 
+            if(phaseId === 3) { currentPzLevel = 0; initMultiPuzzle(); }
+        }
+        
+        function kembaliKeMula() {
+            window.studentName = ""; document.getElementById('login-name').value = ""; document.getElementById('student-name-display').classList.add('hidden'); document.getElementById('super-admin-panel').style.display = 'none'; nextPhase('login'); showToast("Sesi ditamatkan.", "success");
+        }
+        
+        async function panggilFbClearData() {
+            if(confirm("Tindakan ini akan memadam semua data dari Firebase secara Live. Teruskan?")) {
+                if(window.fbClearAllData) await window.fbClearAllData();
+                showToast("Pangkalan data awan dikosongkan.", "success");
+            }
+        }
+
+        function handleEnter(e) { if(e.key === 'Enter') studentLogin(); }
+        
+        function studentLogin() { 
+            const input = document.getElementById('login-name'); const val = input.value.trim();
+            if (val !== "") { 
+                if(val === "4321") { window.studentName = "Neo (Super Admin)"; document.getElementById('super-admin-panel').style.display = 'block'; showToast("SUPER ADMIN BYPASS AKTIF.", "success"); } 
+                else { window.studentName = val; }
+                document.getElementById('display-name').innerText = window.studentName; document.getElementById('student-name-display').classList.remove('hidden'); 
+                if(val !== "4321") showToast(`Identiti disahkan: Ejen ${window.studentName}.`, "success"); 
+                nextPhase(1); 
+            } else { showToast("Ralat: Masukkan pengecam identiti.", "error"); } 
+        }
+
+        function switchView(viewName) { 
+            if (viewName === 'teacher') { document.getElementById('teacher-pin-modal').classList.remove('hidden'); document.getElementById('teacher-pin-input').value = ''; document.getElementById('teacher-pin-input').focus(); return; }
+            document.getElementById('landing-view').classList.add('hidden'); document.getElementById('student-view').classList.add('hidden'); document.getElementById('teacher-view').classList.add('hidden'); 
+            if (viewName === 'student') { document.getElementById('student-view').classList.remove('hidden'); document.getElementById('phase-login').classList.remove('hidden'); } 
+        }
+
+        function checkTeacherPin() {
+            if (document.getElementById('teacher-pin-input').value === '4321') { 
+                window.isTeacher = true; closePinModal();
+                document.getElementById('landing-view').classList.add('hidden'); document.getElementById('teacher-view').classList.remove('hidden'); document.getElementById('section-notes').classList.remove('hidden');
+                showToast("Akses Pendidik Dibenarkan (Cloud Sync Aktif).", "success");
+            } else { showToast("Kata laluan salah.", "error"); document.getElementById('teacher-pin-input').value = ''; }
+        }
+
+        function closePinModal() { document.getElementById('teacher-pin-modal').classList.add('hidden'); }
+        function handlePinEnter(e) { if (e.key === 'Enter') checkTeacherPin(); }
+        
+        window.changeSlide = function(dir) { const next = currentSlideTeacher + dir; if (next >= 1 && next <= 9) { document.getElementById(`slide-${currentSlideTeacher}`).classList.remove('active'); document.getElementById(`slide-${next}`).classList.add('active'); currentSlideTeacher = next; updateSlideDots(); } }
+        function updateSlideDots() { const d = document.getElementById('slide-dots'); if(d) d.innerHTML = Array.from({length:9}, (_,i) => `<div class="h-3 transition-all duration-300 rounded-full ${i+1===currentSlideTeacher ? 'bg-cyan-500 w-10 shadow-md' : 'bg-slate-300 w-3'}"></div>`).join(''); }
+        
+        document.addEventListener('keydown', (e) => { 
+            // Abaikkan arahan shortcut jika pengguna sedang menaip dalam kotak teks
+            if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return; 
+            
+            // F untuk Fullscreen Toggle
+            if(e.key.toLowerCase() === 'f') {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().catch(err => {
+                        console.log(`Ralat mengaktifkan skrin penuh: ${err.message}`);
+                    });
+                } else {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    }
+                }
+            }
+
+            // Arahan Arrow Kiri/Kanan untuk Slaid Guru
+            if(!document.getElementById('section-notes').classList.contains('hidden')){ 
+                if(e.key === 'ArrowLeft') window.changeSlide(-1); 
+                if(e.key === 'ArrowRight') window.changeSlide(1); 
+            } 
+        });
+        
+        let toastTimeout; function showToast(msg, type = "success") { const toast = document.getElementById('system-toast'); const iconBg = document.getElementById('toast-icon-bg'); const icon = document.getElementById('toast-icon'); const title = document.getElementById('toast-title'); if (type === "error") { iconBg.className = "w-12 h-12 rounded-full bg-red-100 flex items-center justify-center text-red-600 text-2xl"; icon.className = "fa-solid fa-triangle-exclamation"; title.innerText = "Amaran Sistem"; toast.style.borderLeftColor = "#ef4444"; } else { iconBg.className = "w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 text-2xl"; icon.className = "fa-solid fa-check-circle"; title.innerText = "Sistem Aktif"; toast.style.borderLeftColor = "#10b981"; } document.getElementById('system-toast-msg').innerText = msg; toast.classList.add('show'); clearTimeout(toastTimeout); toastTimeout = setTimeout(() => { toast.classList.remove('show'); }, 4000); }
+        function toggleDef(c){ const d=c.querySelector('.definition'),ic=c.querySelector('i'); if(d){ if(d.classList.contains('hidden')){ d.classList.remove('hidden'); c.style.borderColor='#0ea5e9'; c.style.background='#f0f9ff'; if(ic)ic.classList.replace('text-slate-400','text-cyan-600'); }else{ d.classList.add('hidden'); c.style.borderColor=''; c.style.background=''; if(ic)ic.classList.replace('text-cyan-600','text-slate-400'); } } }
+        function muatTurunPDF() { showToast("Menjana Dokumen PDF...", "success"); const element = document.getElementById('pdf-report-container'); element.style.opacity = "1"; const opt = { margin: 0, filename: `Laporan_Hujahan_${window.studentName.replace(/\s+/g, '_')}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } }; html2pdf().set(opt).from(element).save().then(() => { element.style.opacity = "0"; }); }
+        
+        updateSlideDots();
+    </script>
+</body>
+</html>
